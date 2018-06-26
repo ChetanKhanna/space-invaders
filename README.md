@@ -1,7 +1,7 @@
 # Space Invaders
 A game that needs no introduction.
 
-###About :
+### About :
 Space Invaders is a two-dimensional fixed shooter game in which the player controls 
 a ship with lasers by moving it horizontally across the bottom of the screen and 
 firing at descending aliens. 
@@ -18,7 +18,7 @@ and award bonus points if destroyed.
 The ship is partially protected by several stationary defense bunkers that are 
 gradually destroyed by projectiles from the aliens and player.
 
-###How To Play :
+### How To Play :
 
 If you don't have Python or Pygame installed, you can simply double click the .exe file to play the game. 
 Note: The .exe file needs to stay in the same directory as the sounds, images, and font folders.
@@ -32,12 +32,12 @@ python spaceinvaders.py
 Note: If you're using Python 3, replace the command "python" with "python3"
 
 
-###Members:
+### Members:
 1. Avi Shrivastava
 2. Arshdeep Singh
 3. Chetan
 4. Mithun Nair
 5. Sarthak Modi
 
-#####Disclaimer :
+##### Disclaimer :
 This project is done as an assignment for QSTP.
