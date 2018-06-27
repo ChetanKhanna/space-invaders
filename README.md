@@ -31,8 +31,8 @@ Note: If you're using Python 3, replace the command "python" with "python3"
 
 
 ### Members:
-1. Avi Shrivastava
-2. Arshdeep Singh
+1. Arshdeep Singh
+2. Avi Shrivastava
 3. Chetan
 4. Mithun Nair
 5. Sarthak Modi
