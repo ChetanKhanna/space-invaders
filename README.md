@@ -35,7 +35,15 @@ Note: If you're using Python 3, replace the command "python" with "python3"
 2. Avi Shrivastava
 3. Chetan
 4. Mithun Nair
-5. Sarthak Modi
+5. Saarthak Modi
+
+### Reference Links:
+1. Basic Info about the game:https://www.leejamesrobinson.com/blog/space-invaders-with-python/
+2. Youtube tutorials :https://www.youtube.com/watch?v=QvtlEj_T55o&list=PLlEgNdBJEO-lqvqL5nNNZC6KoRdSrhQwK
+3. Look of the game:https://www.youtube.com/watch?v=_2yUP3WMDRc
+4. Pygame Tutorials(sprites):https://www.youtube.com/watch?v=y6hQdd68xaw
+5. Sprite Documentation:https://www.pygame.org/docs/ref/sprite.html
+
 
 ##### Disclaimer :
 This project is done as an assignment for QSTP.
