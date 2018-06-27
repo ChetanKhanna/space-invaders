@@ -63,6 +63,7 @@ def right():
 
 #To go Left
 def left():
+    print("left")
     global ships
 
 def welcome_message():
