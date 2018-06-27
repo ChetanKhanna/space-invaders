@@ -42,35 +42,35 @@ class Ship(object):
 
     def update(self):
 
-class Bullet(sprite.Sprite):
+class Bullet(object):
 	def __init__(self):
 
 	def update(self):
 
 
-class Enemy(sprite.Sprite):
+class Enemy(object):
 	def __init__(self, row, column):
 
 	#Other methods for displaying, updating and images
 
 
-class Blocker(sprite.Sprite):
+class Blocker(object):
 	def __init__(self):
 
     #Other methods for displaying, updating and images
 
-class Mystery(sprite.Sprite):
+class Mystery(object):
 	def __init__(self):
 
 	#Other methods for displaying, updating and images
 
 
-class Explosion(sprite.Sprite):
+class Explosion(object):
 	def __init__(self):
 
     #Other methods for displaying, updating and images
 
-class Life(sprite.Sprite):
+class Life(object):
 	def __init__(self):
 
 	#Other methods for displaying, updating and images
