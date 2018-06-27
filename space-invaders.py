@@ -53,6 +53,18 @@ def draw():
     #TODO add everything related to game
     global ships
 
+#To shoot from the ship
+def shoot():
+    global ships
+
+#To go Right
+def right():
+    global ships
+
+#To go Left
+def left():
+    global ships
+
 def welcome_message():
     global current_player
     # Welcome screen
@@ -71,12 +83,9 @@ def main():
             if event.type == pygame.QUIT:#If user quits game
                 quit = True
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
-                    #print("Down")
-                    down()
-                if event.key == pygame.K_UP:
-                    #print("Up")
-                    up()
+                if event.key == pygame.K_SPACE:
+                    #print("Shoot")
+                    shoot()
                 if event.key == pygame.K_RIGHT:
                     #print("Right")
                     right()
