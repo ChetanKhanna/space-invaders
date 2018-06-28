@@ -119,16 +119,6 @@ class Blocker(pygame.sprite.Sprite):
         super().__init__()
         self.x = x
         self.y = y
-        # or probably, just a simple rectangle object.
-        # for i in range(self.height):
-        #     for j in range(self.width):
-        #         pygame.draw.rect(display, self.color,
-        #                          self.small_area, width = 0)
-        
-        # This will basically give a rectangle of rectangles
-        # We can then delete each smaller rectange as a
-        # missile hits it. Not really sure how well it will
-        # work though
         
     def draw(self):
         # pygame.draw.rect(screen, WHITE, [self.x, self.y, 125,  60])
