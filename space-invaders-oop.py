@@ -171,7 +171,7 @@ class SpaceInvaders(object):
 
 	#Functions for working on Sound, initial, score, displaying etc.
 
-    def main(self):
+    def main(self):     
         block_1 = Blocker(75,450)
         block_2 = Blocker(337.5,450)
         block_3 = Blocker(600, 450)
