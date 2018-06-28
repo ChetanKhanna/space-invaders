@@ -11,12 +11,9 @@ pygame.font.init()
 #Creating fonts
 #add game fonts here
 
-#Defining RGB values for colours
-BLACK = ( 0, 0, 0)
+#Defining RGB values for colours        #If it's okay, let's just keep the game Black and White
+BLACK = ( 0, 0, 0)                      #Gives the game an arcade touch I believe :)
 WHITE = (255, 255, 255)
-
-screen = pygame.display.set_mode((600,800)) #Initialzing a screen for display
-pygame.display.set_caption('Space Invaders')
 
 #List to store enemy ships
 ships = [
@@ -35,6 +32,29 @@ current_player = 1
 draw_state = 0
 #other variables will also be required
 
+## shots to kill defender in easy level, 2 for medium and 1 for high diffiulty level
+DIFFICULTY = {"HIGH":1, "MEDIUM":2, "LOW":3}
+#Defining window boundaries and game boundaries
+WINDOW_WIDTH = 1000
+WINDOW_HEIGHT = 600
+GAME_WIDTH = WINDOW_WIDTH - 100         #Ships will move in this area
+GAME_HEIGHT = WINDOW_HEIGHT - 250
+STONE_HEIGHT                            #Once the ships reach this depth, Game Over[Co-ordinates to be decided]
+
+SHIP_VERTICAL_VELOCITY                  #Velocity to be decided
+SHIP_HORIZONTAL_VELOCITY
+DEFENDER_VERTICAL_VELOCITY
+#The idea is that different rows of ship can fire at different rates, say the tougher ones fire more rapidly
+SHIP_FIRE_RATE
+DEFENDER_FIRE_RATE 
+
+SHIP_MISSILE_SIZE                 #missile size to be decided
+DEFENDER_MISSILE_SIZE
+
+
+screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT)) #Initialzing a screen for display
+pygame.display.set_caption('Space Invaders')
+
 #Initialzing high score from text file "highscore.txt"
 try:
     filename = "highscore.txt"
@@ -47,7 +67,6 @@ except:
     highest_score=0
 
 #Classes for all game parts like ship, enemy_ship, laser etc.
-
 #To draw the game matrix, scores and buttons
 def draw():
     #TODO add everything related to game
