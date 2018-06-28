@@ -45,18 +45,10 @@ SHIP_VERTICAL_VELOCITY                  #Velocity to be decided
 SHIP_HORIZONTAL_VELOCITY
 DEFENDER_VERTICAL_VELOCITY
 #The idea is that different rows of ship can fire at different rates, say the tougher ones fire more rapidly
-SHIP_ROW_1_FIRE_RATE
-SHIP_ROW_2_FIRE_RATE
-SHIP_ROW_3_FIRE_RATE                    #Fire Rates to be decided
-SHIP_ROW_4_FIRE_RATE
-SHIP_ROW_5_FIRE_RATE
+SHIP_FIRE_RATE
 DEFENDER_FIRE_RATE 
 
-SHIP_ROW_1_MISSILE_SIZE                 #missile size to be decided
-SHIP_ROW_2_MISSILE_SIZE
-SHIP_ROW_3_MISSILE_SIZE
-SHIP_ROW_4_MISSILE_SIZE
-SHIP_ROW_5_MISSILE_SIZE
+SHIP_MISSILE_SIZE                 #missile size to be decided
 DEFENDER_MISSILE_SIZE
 
 
@@ -75,7 +67,6 @@ except:
     highest_score=0
 
 #Classes for all game parts like ship, enemy_ship, laser etc.
-
 #To draw the game matrix, scores and buttons
 def draw():
     #TODO add everything related to game
