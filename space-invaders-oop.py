@@ -143,7 +143,6 @@ class Blocker(pygame.sprite.Sprite):
         pass
         
 
-
 class Mystery(object):
     def __init__(self):
         pass
@@ -190,7 +189,16 @@ class SpaceInvaders(object):
         #def reset(self):
 
     def welcome_screen(self):
+	#Filling screen black
         self.screen.fill(BLACK)
+	
+	#Initial Game sound in infinite loop
+        pygame.mixer.music.load('./sounds/Title_Screen.wav')
+        pygame.mixer.music.play(-1)
+	
+	########################################
+	####Loading Titles and Enemy Points#####
+	########################################
 
         pygame.mixer.music.load('./sounds/Title_Screen.wav')
         pygame.mixer.music.play(-1)
@@ -277,7 +285,7 @@ class SpaceInvaders(object):
     def main(self):
         quit = False
         self.welcome_screen() #Display welcome message
-        
+
         while not quit:
 
             for event in pygame.event.get():
