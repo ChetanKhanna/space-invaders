@@ -1,6 +1,7 @@
 #Importing required modules
 import pygame
 import random
+import time
 
 #Defining RGB values for colours
 BLACK = ( 0, 0, 0)
@@ -136,7 +137,7 @@ class Blocker(pygame.sprite.Sprite):
             for j in range(5):
                 x_pos = self.x + 25*j
                 y_pos = self.y + 12*i
-                pygame.draw.rect(screen, WHITE, [x_pos, y_pos, 25, 12])
+                pygame.draw.rect(game.screen, WHITE, [x_pos, y_pos, 25, 12])
         
     def damage(self):
         pass
@@ -235,23 +236,57 @@ class SpaceInvaders(object):
         textsurface = self.titleText3.render('Press any key to continue', False, TITLE_WHITE)
         self.screen.blit(textsurface,(200,500))
 
-
+    def start_game(self):
+        self.background = pygame.image.load("./images/background.png").convert_alpha()
+        self.background = pygame.transform.scale(self.background, (800,600))
+        
+        self.screen.fill(BLACK)
+        start_time = time.time()
+        end =  False
+        while not end:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                    
+            current_time = time.time() - start_time
+            if current_time <= 3:
+                alpha = (1.0 * current_time / 3)
+                
+            else:
+                end = True
+                
+            self.new_surface = pygame.surface.Surface((800,600))
+            self.new_surface.set_alpha(255 * alpha)
+            
+            self.screen.fill(BLACK)
+            self.new_surface.blit(self.background, (0,0))
+            self.screen.blit(self.new_surface,(0,0))
+            
+            pygame.display.flip()
+            
+        block_1 = Blocker(75,450)
+        block_2 = Blocker(337.5,450)
+        block_3 = Blocker(600, 450)
+        block_1.draw()
+        block_2.draw()
+        block_3.draw()
+        
+        self.draw_state += 1
+    
     def main(self):
         quit = False
         self.welcome_screen() #Display welcome message
-
+        
         while not quit:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: #If user quits game
                     quit = True
-                    
-            block_1 = Blocker(75,450)
-            block_2 = Blocker(337.5,450)
-            block_3 = Blocker(600, 450)
-            block_1.draw()
-            block_2.draw()
-            block_3.draw()
+                if event.type == pygame.KEYDOWN:
+                    if self.draw_state == 0:
+                        self.start_game()    
+                 
             """ if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         #print("Shoot")
