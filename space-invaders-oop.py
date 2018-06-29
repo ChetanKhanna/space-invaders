@@ -26,17 +26,6 @@ ships = [
     [1,1,1,1,1,1,1,1,1,1,1]
 ]
 
-#Initialzing high score from text file "highscore.txt"
-try:
-    filename = "highscore.txt"
-    file = open(filename,"r")
-    highest_score = int(file.read())
-    if highest_score == ' ':
-        highest_score=0
-    file.close()
-except:
-    highest_score=0
-
 class Ship(pygame.sprite.Sprite):
     """
     Defining the defender spaceship and its
@@ -45,25 +34,31 @@ class Ship(pygame.sprite.Sprite):
 
     # defines the initial x and y pos of our ship
     def __init__(self, x_pos, y_pos):
-        sprite.Sprite.__init__()
+        super().__init__()
 
-        self.image = pygame.image.load("ship.png").convert_alpha()
+        #self.enemy1 = pygame.image.load("./images/enemy3_1.png").convert_alpha()
+        #self.enemy1 = pygame.transform.scale(self.enemy1 , (40, 40))
+        #self.screen.blit(self.enemy1, (300, 250))
+
+        self.image = pygame.image.load("./images/ship.png").convert_alpha()
         self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
-        self.moving_speed = 4
+        #self.screen.blit(self.image, (x_pos, y_pos))
+        self.moving_speed = 1
 
-    # defines the left movement
-    def left(self):
-        if self.rect.x > 20:
-            self.rect.x -= self.moving_speed
-            game.screen.blit(self.image, self.rect)
+    def update(self, screen, keystate):
+        if keystate[pygame.K_RIGHT]:
+            if self.rect.x < 730:
+                self.rect.x += self.moving_speed
 
-    # defines the right movement
-    def right(self):
-        if self.rect.x < 780:
-            self.rect.x += self.moving_speed
-            game.screen.blit(self.image, self.rect)
-        pass
-        
+        if keystate[pygame.K_LEFT]:
+            if self.rect.x > 20:
+                self.rect.x -= self.moving_speed
+
+        self.draw(screen)
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect)
+
     def shoot(self):
        # Missile.shoot() # missile is another class
                         # not sure, still
@@ -167,7 +162,9 @@ class SpaceInvaders(object):
         #Initialize pygame
         pygame.init()
 
-        #Add sounds here
+        #Initial Game sound in infinite loop
+        pygame.mixer.music.load('./sounds/Title_Screen.wav')
+        pygame.mixer.music.play(-1)
 
         #Load screen and caption
         #Initialzing a screen for display
@@ -185,6 +182,16 @@ class SpaceInvaders(object):
         #Initializing font module
         pygame.font.init()
 
+        #Initialzing high score from text file "highscore.txt"
+        try:
+            filename = "highscore.txt"
+            file = open(filename,"r")
+            self.highest_score = int(file.read())
+            if self.highest_score == ' ':
+                self.highest_score=0
+            file.close()
+        except:
+            self.highest_score=0
         #Functions for working on Sound, initial, score, displaying etc.
         #def reset(self):
 
@@ -192,13 +199,9 @@ class SpaceInvaders(object):
 	#Filling screen black
         self.screen.fill(BLACK)
 	
-	#Initial Game sound in infinite loop
-        pygame.mixer.music.load('./sounds/Title_Screen.wav')
-        pygame.mixer.music.play(-1)
-	
-	########################################
-	####Loading Titles and Enemy Points#####
-	########################################
+    	########################################
+	    ####Loading Titles and Enemy Points#####
+	    ########################################
 
         pygame.mixer.music.load('./sounds/Title_Screen.wav')
         pygame.mixer.music.play(-1)
@@ -244,10 +247,49 @@ class SpaceInvaders(object):
         textsurface = self.titleText3.render('Press any key to continue', False, TITLE_WHITE)
         self.screen.blit(textsurface,(200,500))
 
+    def update_stats(self):
+        """
+        Function to show current score, highest score and number of lifes left
+        """
+        self.scoreText = pygame.font.Font(FONT, 20)
+
+        #update score
+        textsurface = self.scoreText.render(("Score: "+str(self.current_score)), False, BLUE)
+        self.screen.blit(textsurface,(5,5))
+
+        #update high score
+        if self.highest_score <= self.current_score:
+            self.highest_score = self.current_score
+            #To write highest score to file
+            filename = "highscore.txt"
+            file = open(filename,"w")
+            file.write(str(self.highest_score))
+            file.close()
+
+        textsurface = self.scoreText.render(("Highest Score: "+str(self.highest_score)), False, BLUE)
+        self.screen.blit(textsurface,(280,5))
+
+        #update Lifes
+        textsurface = self.scoreText.render("Lives: ", False, BLUE)
+        self.screen.blit(textsurface,(645,5))
+
+        for i in range(self.lives):
+            self.live = pygame.image.load("./images/ship.png").convert_alpha()
+            self.live = pygame.transform.scale(self.live , (20, 20))
+            self.screen.blit(self.live, (725+(i*25), 7))
+
+
+    def update_screen(self):
+        self.screen.fill(BLACK)
+        self.new_surface.blit(self.background, (0,0))
+        self.screen.blit(self.new_surface,(0,0))
+
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
         self.background = pygame.transform.scale(self.background, (800,600))
         
+        ## ADD GAMEPLAY START SOUND HERE
+
         self.screen.fill(BLACK)
         start_time = time.time()
         end =  False
@@ -267,18 +309,22 @@ class SpaceInvaders(object):
             self.new_surface = pygame.surface.Surface((800,600))
             self.new_surface.set_alpha(255 * alpha)
             
-            self.screen.fill(BLACK)
-            self.new_surface.blit(self.background, (0,0))
-            self.screen.blit(self.new_surface,(0,0))
-            
+            self.update_screen()
             pygame.display.flip()
-            
-        block_1 = Blocker(75,450)
-        block_2 = Blocker(337.5,450)
-        block_3 = Blocker(600, 450)
-        block_1.draw()
-        block_2.draw()
-        block_3.draw()
+        
+        ### ADD all Sprites class object declaration HERE ###
+
+        #Defender Ship
+        self.player = Ship(375, 530)
+        self.player.draw(self.screen)
+
+        #Blockers
+        self.block_1 = Blocker(75,450)
+        self.block_2 = Blocker(337.5,450)
+        self.block_3 = Blocker(600, 450)
+        self.block_1.draw()
+        self.block_2.draw()
+        self.block_3.draw()
         
         self.draw_state += 1
     
@@ -288,13 +334,29 @@ class SpaceInvaders(object):
 
         while not quit:
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT: #If user quits game
-                    quit = True
-                if event.type == pygame.KEYDOWN:
-                    if self.draw_state == 0:
-                        self.start_game()    
-                 
+            if self.draw_state == 0:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT: #If user quits game
+                        quit = True
+                    if event.type == pygame.KEYDOWN:
+                        self.start_game()
+
+            if self.draw_state > 0:
+                
+                #Updating Ship's location
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT: #If user quits game
+                        quit = True
+                keystate = pygame.key.get_pressed()
+                
+                ### CALL All updating functions here ###
+                self.screen.blit(self.background,(0,0))
+                self.player.update(self.screen, keystate)
+                self.block_1.draw()
+                self.block_2.draw()
+                self.block_3.draw()
+                self.update_stats()
+
             """ if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         #print("Shoot")
@@ -321,7 +383,8 @@ class SpaceInvaders(object):
                 if won == 1:
                     win_message()#Displaying victory message by calling win_message() function
             """
-            pygame.display.update() #Update portions of the screen for software displays
+            pygame.display.flip()
+            #pygame.display.update() #Update portions of the screen for software displays
             
         pygame.quit() #Uninitialize all pygame modules
 
