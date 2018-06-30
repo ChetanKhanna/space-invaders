@@ -16,7 +16,9 @@ RED = (237, 28, 36)
 
 # adding font file
 FONT = "fonts/space_invaders.ttf"
-
+# Initializing game sounds
+pygame.mixer.init()
+shoot_sound=pygame.mixer.Sound('./sounds/shoot.wav')
 #List to store enemy ships
 ships = [
     [1,1,1,1,1,1,1,1,1,1,1],
@@ -60,10 +62,11 @@ class Ship(pygame.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
     def shoot(self):
+        shoot_sound.play()
        # Missile.shoot() # missile is another class
                         # not sure, still
-       pass
-  
+        pass
+
 class Bullet(pygame.sprite.Sprite):
     """
     describing bullets; thinking to keep missils
@@ -78,8 +81,9 @@ class Bullet(pygame.sprite.Sprite):
         self.direction = direction
         self.speed = speed
         pass
-        
+
     def shoot(self):
+        shoot_sound.play()
         # if it goes beyond certain dimension, self.kill()
         # self.rect.y += self.speed * self.direction
         pass
@@ -96,17 +100,18 @@ class Enemy(pygame.sprite.Sprite):
 
         self.image = alien_image
         self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
-        pass 
-            
+        pass
+
     def move_down(self, movement):
         # to make the ship come down
         pass
-        
-    def move_horizontal(self, movement): 
+
+    def move_horizontal(self, movement):
         # to make ship oscilate horizontally
         pass
-        
+
     def shoot(self):
+        shoot_sound.play()
         # not all ships will shoot at once, we need to randomly select some of them
         # and call the Missile.shoot function or something to make them shoot
         pass
@@ -120,23 +125,23 @@ class Blocker(pygame.sprite.Sprite):
         super().__init__()
         self.x = x
         self.y = y
-        
+
     def draw(self):
         # pygame.draw.rect(screen, WHITE, [self.x, self.y, 125,  60])
-        
-        # instead of making it single rectangle, distributed each 
+
+        # instead of making it single rectangle, distributed each
         # rectangle into 25 smaller rectangles. Thought this may
-        # help in collision detection and we can delete smaller rectangles 
+        # help in collision detection and we can delete smaller rectangles
         # when a missile hits it.
         for i in range(5):
             for j in range(5):
                 x_pos = self.x + 25*j
                 y_pos = self.y + 12*i
                 pygame.draw.rect(game.screen, WHITE, [x_pos, y_pos, 25, 12])
-        
+
     def damage(self):
         pass
-        
+
 
 class Mystery(object):
     def __init__(self):
@@ -198,7 +203,7 @@ class SpaceInvaders(object):
     def welcome_screen(self):
 	#Filling screen black
         self.screen.fill(BLACK)
-	
+
     	########################################
 	    ####Loading Titles and Enemy Points#####
 	    ########################################
@@ -287,7 +292,7 @@ class SpaceInvaders(object):
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
         self.background = pygame.transform.scale(self.background, (800,600))
-        
+
         ## ADD GAMEPLAY START SOUND HERE
 
         self.screen.fill(BLACK)
@@ -298,20 +303,20 @@ class SpaceInvaders(object):
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                    
+
             current_time = time.time() - start_time
             if current_time <= 3:
                 alpha = (1.0 * current_time / 3)
-                
+
             else:
                 end = True
-                
+
             self.new_surface = pygame.surface.Surface((800,600))
             self.new_surface.set_alpha(255 * alpha)
-            
+
             self.update_screen()
             pygame.display.flip()
-        
+
         ### ADD all Sprites class object declaration HERE ###
 
         #Defender Ship
@@ -325,9 +330,9 @@ class SpaceInvaders(object):
         self.block_1.draw()
         self.block_2.draw()
         self.block_3.draw()
-        
+
         self.draw_state += 1
-    
+
     def main(self):
         quit = False
         self.welcome_screen() #Display welcome message
@@ -342,13 +347,13 @@ class SpaceInvaders(object):
                         self.start_game()
 
             if self.draw_state > 0:
-                
+
                 #Updating Ship's location
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT: #If user quits game
                         quit = True
                 keystate = pygame.key.get_pressed()
-                
+
                 ### CALL All updating functions here ###
                 self.screen.blit(self.background,(0,0))
                 self.player.update(self.screen, keystate)
@@ -385,7 +390,7 @@ class SpaceInvaders(object):
             """
             pygame.display.flip()
             #pygame.display.update() #Update portions of the screen for software displays
-            
+
         pygame.quit() #Uninitialize all pygame modules
 
 
