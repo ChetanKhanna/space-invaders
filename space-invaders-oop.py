@@ -18,6 +18,7 @@ RED = (237, 28, 36)
 FONT = "fonts/space_invaders.ttf"
 # Initializing game sounds
 shoot_sound=pygame.mixer.Sound('./sounds/shoot.wav')
+
 #List to store enemy ships
 ships = [
     [1,1,1,1,1,1,1,1,1,1,1],
