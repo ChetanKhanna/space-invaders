@@ -17,7 +17,9 @@ ROCK = (138, 51, 36)
 
 # adding font file
 FONT = "fonts/space_invaders.ttf"
-
+# Initializing game sounds
+pygame.mixer.init()
+shoot_sound=pygame.mixer.Sound('./sounds/shoot.wav')
 #List to store enemy ships
 ships = [
     [1,1,1,1,1,1,1,1,1,1,1],
@@ -58,7 +60,8 @@ class Ship(pygame.sprite.Sprite):
         # Missile.shoot() # missile is another class
                          # not sure, still
         pass
-  
+
+
 class Bullet(pygame.sprite.Sprite):
     """
     describing bullets; thinking to keep missils
@@ -73,8 +76,9 @@ class Bullet(pygame.sprite.Sprite):
         self.direction = direction
         self.speed = speed
         pass
-        
+
     def shoot(self):
+        shoot_sound.play()
         # if it goes beyond certain dimension, self.kill()
         # self.rect.y += self.speed * self.direction
         pass
@@ -93,8 +97,9 @@ class Enemy(pygame.sprite.Sprite):
     def update(self):
         ### A FUNCTION WHICH MOVES All_Aliens SPRITE GROUP ###
         pass
-        
+
     def shoot(self):
+        shoot_sound.play()
         # not all ships will shoot at once, we need to randomly select some of them
         # and call the Missile.shoot function or something to make them shoot
         pass
@@ -111,13 +116,13 @@ class Blocker(pygame.sprite.Sprite):
         super().__init__()
         self.x = x
         self.y = y
-        
+
     def draw(self):
         # pygame.draw.rect(screen, WHITE, [self.x, self.y, 125,  60])
-        
-        # instead of making it single rectangle, distributed each 
+
+        # instead of making it single rectangle, distributed each
         # rectangle into 25 smaller rectangles. Thought this may
-        # help in collision detection and we can delete smaller rectangles 
+        # help in collision detection and we can delete smaller rectangles
         # when a missile hits it.
         for i in range(5):
             for j in range(5):
@@ -127,7 +132,7 @@ class Blocker(pygame.sprite.Sprite):
         
     def damage(self):
         pass
-        
+
 
 class Mystery(object):
     def __init__(self):
@@ -184,16 +189,26 @@ class SpaceInvaders(object):
         except:
             self.highest_score=0
 
+        #Initialzing high score from text file "highscore.txt"
+        try:
+            filename = "highscore.txt"
+            file = open(filename,"r")
+            self.highest_score = int(file.read())
+            if self.highest_score == ' ':
+                self.highest_score=0
+            file.close()
+        except:
+            self.highest_score=0
         #Functions for working on Sound, initial, score, displaying etc.
         #def reset(self):
 
     def welcome_screen(self):
 	#Filling screen black
         self.screen.fill(BLACK)
-	
-	########################################
-	####Loading Titles and Enemy Points#####
-	########################################
+
+    	########################################
+	    ####Loading Titles and Enemy Points#####
+	    ########################################
 
         pygame.mixer.music.load('./sounds/Title_Screen.wav')
         pygame.mixer.music.play(-1)
@@ -238,7 +253,7 @@ class SpaceInvaders(object):
 
         textsurface = self.titleText3.render('Press any key to continue', False, TITLE_WHITE)
         self.screen.blit(textsurface,(200,500))
-        
+
     def update_stats(self):
         """
         Function to show current score, highest score and number of lifes left
@@ -270,13 +285,19 @@ class SpaceInvaders(object):
             self.live = pygame.transform.scale(self.live , (20, 20))
             self.screen.blit(self.live, (725+(i*25), 7))
         
-    
-    
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
         self.background = pygame.transform.scale(self.background, (800,600))
         
         ## ADD GAMEPLAY AND START SOUND HERE
+    def start_game(self):
+        self.background = pygame.image.load("./images/background.png").convert_alpha()
+        self.background = pygame.transform.scale(self.background, (800,600))
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load('./sounds/game_sound.wav')
+        pygame.mixer.music.play(-1)
+        
+        ## ADD GAMEPLAY START SOUND HERE
         
         self.screen.fill(BLACK)
         start_time = time.time()
@@ -302,9 +323,9 @@ class SpaceInvaders(object):
             self.screen.blit(self.background_surface,(0,0))
 
             pygame.display.flip()
-        
+
         ### ADD all Sprites class object declaration HERE ###
-        
+
         #Defender Ship
         self.player = Ship(375, 530)
         self.player.draw()
@@ -318,10 +339,9 @@ class SpaceInvaders(object):
         self.block_3.draw()
         
         # Drawing ships                
-        
-        
+
         self.draw_state += 1
-    
+
     def main(self):
         quit = False
         self.welcome_screen() #Display welcome message
@@ -336,7 +356,6 @@ class SpaceInvaders(object):
                         self.start_game()
 
             if self.draw_state > 0:
-                
                 #Updating Ship's location
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT: #If user quits game
@@ -378,7 +397,8 @@ class SpaceInvaders(object):
                     win_message()#Displaying victory message by calling win_message() function
             """
             pygame.display.flip() #Update portions of the screen for software displays
-            
+            #pygame.display.update() #Update portions of the screen for software displays
+
         pygame.quit() #Uninitialize all pygame modules
 
 
