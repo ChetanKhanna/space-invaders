@@ -292,7 +292,9 @@ class SpaceInvaders(object):
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
         self.background = pygame.transform.scale(self.background, (800,600))
-
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load('./sounds/game_sound.wav')
+        pygame.mixer.music.play(-1)
         ## ADD GAMEPLAY START SOUND HERE
 
         self.screen.fill(BLACK)
