@@ -42,7 +42,7 @@ class Ship(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
         self.moving_speed = 1
         self.bullet_group = pygame.sprite.Group()
-        
+
     def update(self, keystate):
         #Right Key
         if keystate[pygame.K_RIGHT] or keystate[pygame.K_d]:
@@ -63,11 +63,11 @@ class Ship(pygame.sprite.Sprite):
     def draw(self):
         #Drawing the Ship
         game.screen.blit(self.image, self.rect)
-        
+
         grplen = len(self.bullet_group.sprites())
         if grplen:
             self.player_bullet.update()
-            self.player_bullet.draw()   
+            self.player_bullet.draw()
 
     def shoot(self):
         self.player_bullet = Bullet((self.rect.x + 25) , self.rect.y, ofPlayer = True)
@@ -82,7 +82,7 @@ class Bullet(pygame.sprite.Sprite):
     defender
     """
     def __init__(self, x_pos, y_pos, ofPlayer):
-        
+
         super().__init__()
         if ofPlayer is True:
             self.image = pygame.image.load("./images/laser.png").convert_alpha()
@@ -112,7 +112,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, image, x, y):
         super().__init__()
         pass
-            
+
     def update(self):
         ### A FUNCTION WHICH MOVES All_Aliens SPRITE GROUP ###
         pass
@@ -122,7 +122,7 @@ class Enemy(pygame.sprite.Sprite):
         # not all ships will shoot at once, we need to randomly select some of them
         # and call the Missile.shoot function or something to make them shoot
         pass
-        
+
     def draw(self):
         pass
 
@@ -148,29 +148,29 @@ class Blocker(pygame.sprite.Sprite):
                 x_pos = self.x + 25*j
                 y_pos = self.y + 12*i
                 pygame.draw.rect(game.screen, ROCK, [x_pos, y_pos, 25, 12])
-        
+
     def damage(self):
         pass
 
 
 class Mystery(pygame.sprite.Sprite):
-    '''                                
-    Class for mystery ship               
-    '''                               
-    def __init__(self):                               
+    '''
+    Class for mystery ship
+    '''
+    def __init__(self):
         super().__init__()
-           
+
         self.image = pygame.image.load("./images/mystery.png")
         self.image = pygame.transform.scale(self.image, (75, 35))
         self.rect = self.image.get_rect(topleft=(20,40))
         self.health=3
-           
-        
-    
 
-        
-    ''' 
-    def status(self,bullet): 
+
+
+
+
+    '''
+    def status(self,bullet):
         if bullet.rect.x=self.rect.x and bullet.rect.y=self.rect.y:
             self.health=self.health-1
             if self.health==0:
@@ -180,7 +180,7 @@ class Mystery(pygame.sprite.Sprite):
             else:
                 return 0
         else return 0
-    ''' 
+    '''
 
 
 
@@ -222,7 +222,7 @@ class SpaceInvaders(object):
 
         #Initializing font module
         pygame.font.init()
-        
+
         #Initialzing high score from text file "highscore.txt"
         try:
             filename = "highscore.txt"
@@ -288,6 +288,18 @@ class SpaceInvaders(object):
         textsurface = self.titleText3.render('Press any key to continue', False, TITLE_WHITE)
         self.screen.blit(textsurface,(200,500))
 
+    def mute_status(self,ctr):                ##Definition for mute button
+        mouse = pygame.mouse.get_pos()
+        click_status=pygame.mouse.get_pressed()
+        if 785 > mouse[0] > 745 and 45 > mouse[1] > 5:
+            if click_status[0]==1 :
+                ctr=ctr+1
+                if ctr % 2 == 0 :
+                    pygame.mixer.music.unpause()
+                else :
+                    pygame.mixer.music.pause()
+        return ctr
+
     def update_stats(self):
         """
         Function to show current score, highest score and number of lifes left
@@ -309,20 +321,22 @@ class SpaceInvaders(object):
 
         #Display High Score
         textsurface = self.scoreText.render(("Highest Score: "+str(self.highest_score)), False, BLUE)
-        self.screen.blit(textsurface,(280,5))
+        self.screen.blit(textsurface,(230,5))
 
         #Display Life Text
         textsurface = self.scoreText.render("Lives: ", False, BLUE)
-        self.screen.blit(textsurface,(645,5))
+        self.screen.blit(textsurface,(570,5))
 
         #Shows lifes left
         for i in range(self.lives):
             self.live = pygame.image.load("./images/ship.png").convert_alpha()
             self.live = pygame.transform.scale(self.live , (20, 20))
-            self.screen.blit(self.live, (725+(i*25), 7))
-        
-    
-        
+            self.screen.blit(self.live, (650+(i*25), 7))
+
+        button=pygame.image.load("./images/mutebutton.png")
+        button=pygame.transform.scale(button,(30,30))
+        self.screen.blit(button, (750,5))
+
 
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
@@ -330,9 +344,9 @@ class SpaceInvaders(object):
         pygame.mixer.music.stop()
         pygame.mixer.music.load('./sounds/game_sound.wav')
         pygame.mixer.music.play(-1)
-        
+
         ## ADD GAMEPLAY START SOUND HERE
-        
+
         self.screen.fill(BLACK)
         start_time = time.time()
         end =  False
@@ -341,21 +355,21 @@ class SpaceInvaders(object):
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                    
+
             elapsed_time = time.time() - start_time
             if elapsed_time <= 1:
                 alpha = (1.0 * elapsed_time )
-                
+
             else:
                 end = True
-                
+
             self.background_surface = pygame.surface.Surface((800,600))
             self.background_surface.set_alpha(255 * alpha)
-            
+
             self.screen.fill(BLACK)
             self.background_surface.blit(self.background, (0,0))
             self.screen.blit(self.background_surface,(0,0))
-      
+
             pygame.display.flip()
 
         ### ADD all Sprites class object declaration HERE ###
@@ -372,16 +386,16 @@ class SpaceInvaders(object):
         self.block_2.draw()
         self.block_3.draw()
         #self.mystery=Mystery()
-        
-        # Drawing ships                
+
+        # Drawing ships
         self.draw_state += 1
 
     def appear(self,randnum,screen,background):
-        
+
         if randnum > 350 and randnum < 380 :
-            direct=random.randint(1,3) 
+            direct=random.randint(1,3)
             if direct==2:
-                self.mystery.rect.x=780  
+                self.mystery.rect.x=780
             while self.mystery.rect.x <=780 and direct==1:
                 '''
                 if self.mystery.status():
@@ -391,7 +405,7 @@ class SpaceInvaders(object):
                     if event.type == pygame.QUIT: #If user quits game
                         quit = True
                 keystate = pygame.key.get_pressed()
-                
+
                 ### CALL All updating functions here ###
                 self.screen.blit(self.background,(0,0))
                 self.player.update(keystate)
@@ -404,7 +418,7 @@ class SpaceInvaders(object):
                 screen.blit(self.mystery.image,self.mystery.rect)
                 pygame.display.update()
                 #pygame.time.delay(50)
-            
+
             while self.mystery.rect.x >=0 and direct==2:
                 '''
                 if self.mystery.status():
@@ -414,7 +428,7 @@ class SpaceInvaders(object):
                     if event.type == pygame.QUIT: #If user quits game
                         quit = True
                 keystate = pygame.key.get_pressed()
-                
+
                 ### CALL All updating functions here ###
                 self.screen.blit(self.background,(0,0))
                 self.player.update(keystate)
@@ -426,22 +440,22 @@ class SpaceInvaders(object):
                 screen.blit(self.mystery.image,self.mystery.rect)
                 self.mystery.rect.x=self.mystery.rect.x-1
                 pygame.display.update()
-                #pygame.time.delay(50)   
-                
-                
-                
-        screen.blit(background, self.mystery.rect,self.mystery.rect) 
+                #pygame.time.delay(50)
+
+
+
+        screen.blit(background, self.mystery.rect,self.mystery.rect)
         self.mystery.rect.x=20
         self.mystery.health=3
 
 
     def main(self):
         quit = False
+        button_ctr=0
         self.welcome_screen() #Display welcome message
         initial=time.clock()
         while not quit:
-            
-            
+
 
             if self.draw_state == 0:
                 for event in pygame.event.get():
@@ -449,9 +463,7 @@ class SpaceInvaders(object):
                         quit = True
                     if event.type == pygame.KEYDOWN:
                         self.start_game()
-                        
-                        
-                       
+
 
             if self.draw_state > 0:
                 #Updating Ship's location
@@ -459,7 +471,7 @@ class SpaceInvaders(object):
                     if event.type == pygame.QUIT: #If user quits game
                         quit = True
                 keystate = pygame.key.get_pressed()
-                
+
                 ### CALL All updating functions here ###
                 self.screen.blit(self.background,(0,0))
                 self.player.update(keystate)
@@ -467,12 +479,12 @@ class SpaceInvaders(object):
                 self.block_2.draw()
                 self.block_3.draw()
                 self.update_stats()
-             
+
                 num=random.randint(0,100000)
-                self.appear(num,self.screen,self.background)  
-                
-            
-                 
+                self.appear(num,self.screen,self.background)
+                self.mute_status(button_ctr)
+                button_ctr=self.mute_status(button_ctr)
+
             """ won = 1
 
                 #If user destroys all enemy ships
