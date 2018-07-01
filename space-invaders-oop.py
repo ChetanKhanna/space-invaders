@@ -41,25 +41,38 @@ class Ship(pygame.sprite.Sprite):
         self.image = pygame.image.load("./images/ship.png").convert_alpha()
         self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
         self.moving_speed = 1
+        self.bullet_group = pygame.sprite.Group()
         
     def update(self, keystate):
+        #Right Key
         if keystate[pygame.K_RIGHT] or keystate[pygame.K_d]:
             if self.rect.x < 730:
                 self.rect.x += self.moving_speed
 
+        #Left Key
         if keystate[pygame.K_LEFT] or keystate[pygame.K_a]:
             if self.rect.x > 20:
                 self.rect.x -= self.moving_speed
 
+        #Shoot Key
+        if (keystate[pygame.K_SPACE] or keystate[pygame.K_w]) and (len(self.bullet_group.sprites()) == 0):
+            self.shoot()
+
         self.draw()
 
     def draw(self):
-       game.screen.blit(self.image, self.rect)
+        #Drawing the Ship
+        game.screen.blit(self.image, self.rect)
+        
+        grplen = len(self.bullet_group.sprites())
+        if grplen:
+            self.player_bullet.update()
+            self.player_bullet.draw()   
 
     def shoot(self):
-        # Missile.shoot() # missile is another class
-                         # not sure, still
-        pass
+        self.player_bullet = Bullet((self.rect.x + 25) , self.rect.y, ofPlayer = True)
+        self.bullet_group.add(self.player_bullet)
+        shoot_sound.play()
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -68,20 +81,26 @@ class Bullet(pygame.sprite.Sprite):
     type same for everythnig - all alien ships and
     defender
     """
-    def __init__(self, image_missile, x_pos, y_pos, direction, speed):
-
+    def __init__(self, x_pos, y_pos, ofPlayer):
+        
         super().__init__()
-        self.image = image_missile
-        self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
-        self.direction = direction
-        self.speed = speed
-        pass
+        if ofPlayer is True:
+            self.image = pygame.image.load("./images/laser.png").convert_alpha()
+            self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
+            self.velocity = -2
+        else:
+            self.image = pygame.image.load("./images/ship.png").convert_alpha()
+            self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
+            self.velocity = 2
 
-    def shoot(self):
-        shoot_sound.play()
-        # if it goes beyond certain dimension, self.kill()
-        # self.rect.y += self.speed * self.direction
-        pass
+    def update(self):
+        self.rect.y += self.velocity
+        if self.rect.y < 25:
+            self.kill()
+        self.draw()
+
+    def draw(self):
+        game.screen.blit(self.image, self.rect)
 
 
 class Enemy(pygame.sprite.Sprite):
@@ -147,9 +166,6 @@ class Mystery(pygame.sprite.Sprite):
         self.health=3
            
         
-        #Position should be specified which is above the enemy line 
-        #Speed kept slightly lesser than defender ship..can be kept even less
-        #Not sure of the coordinates...can be adjusted later
     
 
         
@@ -207,17 +223,6 @@ class SpaceInvaders(object):
         #Initializing font module
         pygame.font.init()
         
-        #Initialzing high score from text file "highscore.txt"
-        try:
-            filename = "highscore.txt"
-            file = open(filename,"r")
-            self.highest_score = int(file.read())
-            if self.highest_score == ' ':
-                self.highest_score=0
-            file.close()
-        except:
-            self.highest_score=0
-
         #Initialzing high score from text file "highscore.txt"
         try:
             filename = "highscore.txt"
@@ -302,13 +307,15 @@ class SpaceInvaders(object):
             file.write(str(self.highest_score))
             file.close()
 
+        #Display High Score
         textsurface = self.scoreText.render(("Highest Score: "+str(self.highest_score)), False, BLUE)
         self.screen.blit(textsurface,(280,5))
 
-        #update Lifes
+        #Display Life Text
         textsurface = self.scoreText.render("Lives: ", False, BLUE)
         self.screen.blit(textsurface,(645,5))
 
+        #Shows lifes left
         for i in range(self.lives):
             self.live = pygame.image.load("./images/ship.png").convert_alpha()
             self.live = pygame.transform.scale(self.live , (20, 20))
@@ -316,7 +323,7 @@ class SpaceInvaders(object):
         
     
         
-        ## ADD GAMEPLAY AND START SOUND HERE
+
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
         self.background = pygame.transform.scale(self.background, (800,600))
@@ -336,8 +343,8 @@ class SpaceInvaders(object):
                     sys.exit()
                     
             elapsed_time = time.time() - start_time
-            if elapsed_time <= 3:
-                alpha = (1.0 * elapsed_time / 3)
+            if elapsed_time <= 1:
+                alpha = (1.0 * elapsed_time )
                 
             else:
                 end = True
@@ -367,8 +374,8 @@ class SpaceInvaders(object):
         #self.mystery=Mystery()
         
         # Drawing ships                
-
         self.draw_state += 1
+
 
     def appear(self,randnum,screen,background):
         
@@ -403,6 +410,7 @@ class SpaceInvaders(object):
         screen.blit(background, self.mystery.rect,self.mystery.rect) 
         self.mystery.rect.x=20
         self.mystery.health=3
+
 
     def main(self):
         quit = False
@@ -440,24 +448,10 @@ class SpaceInvaders(object):
                 num=random.randint(0,100000)
                 self.appear(num,self.screen,self.background)  
                 
-            """ if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        #print("Shoot")
-                        shoot()
-                    if event.key == pygame.K_RIGHT:
-                        #print("Right")
-                        right()
-                    if event.key == pygame.K_LEFT:
-                        #print("Left")
-                        left()
-            if self.draw_state == 0:#If game has just begun
-                self.welcome_screen()#Display welcome message
+            
+                 
+            """ won = 1
 
-            if self.draw_state > 0: #If game has already begun
-                self.screen.fill(BLACK)
-                draw()#Draw game matrix
-
-                won = 1
                 #If user destroys all enemy ships
                 for i in range(0,11):
                     for j in range(0,5):
