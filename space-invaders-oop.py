@@ -162,7 +162,7 @@ class Mystery(pygame.sprite.Sprite):
            
         self.image = pygame.image.load("./images/mystery.png")
         self.image = pygame.transform.scale(self.image, (75, 35))
-        self.rect = self.image.get_rect(topleft=(20,70))
+        self.rect = self.image.get_rect(topleft=(20,40))
         self.health=3
            
         
@@ -376,6 +376,63 @@ class SpaceInvaders(object):
         # Drawing ships                
         self.draw_state += 1
 
+    def appear(self,randnum,screen,background):
+        
+        if randnum > 350 and randnum < 380 :
+            direct=random.randint(1,3) 
+            if direct==2:
+                self.mystery.rect.x=780  
+            while self.mystery.rect.x <=780 and direct==1:
+                '''
+                if self.mystery.status():
+                    break
+                '''
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT: #If user quits game
+                        quit = True
+                keystate = pygame.key.get_pressed()
+                
+                ### CALL All updating functions here ###
+                self.screen.blit(self.background,(0,0))
+                self.player.update(keystate)
+                self.block_1.draw()             # This will need replacement once damage() function is up.
+                self.block_2.draw()
+                self.block_3.draw()
+                self.update_stats()
+                screen.blit(background, self.mystery.rect,self.mystery.rect) #Erase mystery ship
+                self.mystery.rect.x=self.mystery.rect.x+1
+                screen.blit(self.mystery.image,self.mystery.rect)
+                pygame.display.update()
+                #pygame.time.delay(50)
+            
+            while self.mystery.rect.x >=0 and direct==2:
+                '''
+                if self.mystery.status():
+                    break
+                '''
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT: #If user quits game
+                        quit = True
+                keystate = pygame.key.get_pressed()
+                
+                ### CALL All updating functions here ###
+                self.screen.blit(self.background,(0,0))
+                self.player.update(keystate)
+                self.block_1.draw()             # This will need replacement once damage() function is up.
+                self.block_2.draw()
+                self.block_3.draw()
+                self.update_stats()
+                screen.blit(background, self.mystery.rect,self.mystery.rect) #Erase mystery ship
+                screen.blit(self.mystery.image,self.mystery.rect)
+                self.mystery.rect.x=self.mystery.rect.x-1
+                pygame.display.update()
+                #pygame.time.delay(50)   
+                
+                
+                
+        screen.blit(background, self.mystery.rect,self.mystery.rect) 
+        self.mystery.rect.x=20
+        self.mystery.health=3
 
 
     def main(self):
