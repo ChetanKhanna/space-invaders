@@ -134,11 +134,38 @@ class Blocker(pygame.sprite.Sprite):
         pass
 
 
-class Mystery(object):
-    def __init__(self):
-        pass
+class Mystery(pygame.sprite.Sprite):
+    '''                                
+    Class for mystery ship               
+    '''                               
+    def __init__(self):                               
+        super().__init__()
+           
+        self.image = pygame.image.load("./images/mystery.png")
+        self.image = pygame.transform.scale(self.image, (75, 35))
+        self.rect = self.image.get_rect(topleft=(20,70))
+        self.health=3
+           
+        
+        #Position should be specified which is above the enemy line 
+        #Speed kept slightly lesser than defender ship..can be kept even less
+        #Not sure of the coordinates...can be adjusted later
+    
 
-    #Other methods for displaying, updating and images
+        
+    ''' 
+    def status(self,bullet): 
+        if bullet.rect.x=self.rect.x and bullet.rect.y=self.rect.y:
+            self.health=self.health-1
+            if self.health==0:
+                Add explosion effect and music
+                Add to score
+                return 1
+            else:
+                return 0
+        else return 0
+    ''' 
+
 
 
 class Explosion(object):
@@ -173,6 +200,8 @@ class SpaceInvaders(object):
         self.lives = 3
         self.current_player = 1
         self.draw_state = 0
+        self.mystery=Mystery()
+        self.background = pygame.image.load("./images/background.png").convert_alpha()
         #other variables will also be required
 
         #Initializing font module
@@ -285,9 +314,7 @@ class SpaceInvaders(object):
             self.live = pygame.transform.scale(self.live , (20, 20))
             self.screen.blit(self.live, (725+(i*25), 7))
         
-    def start_game(self):
-        self.background = pygame.image.load("./images/background.png").convert_alpha()
-        self.background = pygame.transform.scale(self.background, (800,600))
+    
         
         ## ADD GAMEPLAY AND START SOUND HERE
     def start_game(self):
@@ -321,7 +348,7 @@ class SpaceInvaders(object):
             self.screen.fill(BLACK)
             self.background_surface.blit(self.background, (0,0))
             self.screen.blit(self.background_surface,(0,0))
-
+      
             pygame.display.flip()
 
         ### ADD all Sprites class object declaration HERE ###
@@ -337,16 +364,53 @@ class SpaceInvaders(object):
         self.block_1.draw()
         self.block_2.draw()
         self.block_3.draw()
+        #self.mystery=Mystery()
         
         # Drawing ships                
 
         self.draw_state += 1
 
+    def appear(self,randnum,screen,background):
+        
+        if randnum > 350 and randnum < 380 :
+            screen.blit(self.mystery.image,self.mystery.rect) #Displays mystery ship
+            pygame.display.update()   
+            while self.mystery.rect.x <=780:
+                '''
+                if self.mystery.status():
+                    break
+                '''
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT: #If user quits game
+                        quit = True
+                keystate = pygame.key.get_pressed()
+                
+                ### CALL All updating functions here ###
+                self.screen.blit(self.background,(0,0))
+                self.player.update(keystate)
+                self.block_1.draw()             # This will need replacement once damage() function is up.
+                self.block_2.draw()
+                self.block_3.draw()
+                self.update_stats()
+                screen.blit(background, self.mystery.rect,self.mystery.rect) #Erase mystery ship
+                self.mystery.rect.x=self.mystery.rect.x+1
+                screen.blit(self.mystery.image,self.mystery.rect)
+                pygame.display.update()
+                #pygame.time.delay(50)
+                
+                
+                
+        screen.blit(background, self.mystery.rect,self.mystery.rect) 
+        self.mystery.rect.x=20
+        self.mystery.health=3
+
     def main(self):
         quit = False
         self.welcome_screen() #Display welcome message
-
+        initial=time.clock()
         while not quit:
+            
+            
 
             if self.draw_state == 0:
                 for event in pygame.event.get():
@@ -354,6 +418,9 @@ class SpaceInvaders(object):
                         quit = True
                     if event.type == pygame.KEYDOWN:
                         self.start_game()
+                        
+                        
+                       
 
             if self.draw_state > 0:
                 #Updating Ship's location
@@ -368,8 +435,11 @@ class SpaceInvaders(object):
                 self.block_1.draw()             # This will need replacement once damage() function is up.
                 self.block_2.draw()
                 self.block_3.draw()
-                self.update_stats()   
-                 
+                self.update_stats()
+             
+                num=random.randint(0,100000)
+                self.appear(num,self.screen,self.background)  
+                
             """ if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         #print("Shoot")
