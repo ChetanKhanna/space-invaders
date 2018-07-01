@@ -377,40 +377,6 @@ class SpaceInvaders(object):
         self.draw_state += 1
 
 
-    def appear(self,randnum,screen,background):
-        
-        if randnum > 350 and randnum < 380 :
-            screen.blit(self.mystery.image,self.mystery.rect) #Displays mystery ship
-            pygame.display.update()   
-            while self.mystery.rect.x <=780:
-                '''
-                if self.mystery.status():
-                    break
-                '''
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT: #If user quits game
-                        quit = True
-                keystate = pygame.key.get_pressed()
-                
-                ### CALL All updating functions here ###
-                self.screen.blit(self.background,(0,0))
-                self.player.update(keystate)
-                self.block_1.draw()             # This will need replacement once damage() function is up.
-                self.block_2.draw()
-                self.block_3.draw()
-                self.update_stats()
-                screen.blit(background, self.mystery.rect,self.mystery.rect) #Erase mystery ship
-                self.mystery.rect.x=self.mystery.rect.x+1
-                screen.blit(self.mystery.image,self.mystery.rect)
-                pygame.display.update()
-                #pygame.time.delay(50)
-                
-                
-                
-        screen.blit(background, self.mystery.rect,self.mystery.rect) 
-        self.mystery.rect.x=20
-        self.mystery.health=3
-
 
     def main(self):
         quit = False
