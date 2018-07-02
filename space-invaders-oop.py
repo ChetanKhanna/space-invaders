@@ -2,6 +2,7 @@
 import pygame
 import random
 import time
+import threading
 
 #Defining RGB values for colours
 BLACK = ( 0, 0, 0)
@@ -15,6 +16,7 @@ PURPLE = (203, 0, 255)
 RED = (237, 28, 36)
 ROCK = (138, 51, 36)
 
+timer = 0
 # adding font file
 FONT = "fonts/space_invaders.ttf"
 # Initializing game sounds
@@ -109,22 +111,52 @@ class Enemy(pygame.sprite.Sprite):
     properties. We need to create a list of
     lists of objects of this class Aliens probably.
     """
+
     def __init__(self, image, x, y):
         super().__init__()
-        pass
-            
+        self.image = pygame.image.load(image).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (35, 35))
+        self.rect = self.image.get_rect(topleft=(x, y))
+        self.speed_H = 15
+        self.speed_V = 12
+
     def update(self):
-        ### A FUNCTION WHICH MOVES All_Aliens SPRITE GROUP ###
-        pass
+        game.timer_1 += game.elapsed_time
+        game.timer_2 += game.elapsed_time
+        game.timer_3 += game.elapsed_time
+
+        for alien in game.All_Aliens:
+            if alien.rect.y >= 415:
+                pygame.quit()
+
+        if game.timer_2 > 1600:
+            self.speed_H = -(self.speed_H)
+            for alien in game.All_Aliens:
+                alien.rect.y += self.speed_V
+                alien.draw()
+            game.timer_2 -= 1600
+            game.timer_1 -= 100  ## To give a pause
+            game.start_time = time.time()
+
+        else:
+            if game.timer_1 >= 100:
+                for alien in game.All_Aliens:
+                    alien.rect.x += self.speed_H
+                    alien.draw()
+                game.timer_1 -= 100
+                game.start_time = time.time()
+
+            else:
+                for alien in game.All_Aliens:
+                    alien.draw()
 
     def shoot(self):
-        shoot_sound.play()
         # not all ships will shoot at once, we need to randomly select some of them
         # and call the Missile.shoot function or something to make them shoot
         pass
-        
+
     def draw(self):
-        pass
+        game.screen.blit(self.image, self.rect)
 
 class Blocker(pygame.sprite.Sprite):
     """
@@ -214,6 +246,9 @@ class SpaceInvaders(object):
     def __init__(self):
         #Initialize pygame
         pygame.init()
+        self.clock = pygame.time.Clock()
+        self.timer = 0
+        self.timer_2 = 0
 
         #Initial Game sound in infinite loop
         pygame.mixer.music.load('./sounds/Title_Screen.wav')
@@ -345,7 +380,9 @@ class SpaceInvaders(object):
         pygame.mixer.music.play(-1)
         
         ## ADD GAMEPLAY START SOUND HERE
-        
+        self.timer_1 = 0
+        self.timer_2 = 0
+        self.timer_3 = 0
         self.screen.fill(BLACK)
         start_time = time.time()
         end =  False
@@ -355,9 +392,9 @@ class SpaceInvaders(object):
                     pygame.quit()
                     sys.exit()
                     
-            elapsed_time = time.time() - start_time
-            if elapsed_time <= 1:
-                alpha = (1.0 * elapsed_time )
+            self.elapsed_time = time.time() - start_time
+            if self.elapsed_time <= 1:
+                alpha = (1.0 * self.elapsed_time )
                 
             else:
                 end = True
@@ -385,8 +422,35 @@ class SpaceInvaders(object):
         self.block_2.draw()
         self.block_3.draw()
         self.mystery=Mystery()
-        
-        # Drawing ships                
+
+        # Drawing ships
+        self.All_Aliens = pygame.sprite.Group()
+        for i in range(11):
+            self.SHIP = Enemy("./images/enemy1_1.png", 20 + 50 * i, 80)
+            self.All_Aliens.add(self.SHIP)
+            self.SHIP.draw()
+        for i in range(11):
+            self.SHIP = Enemy("./images/enemy2_1.png", 20 + 50 * i, 130)
+            self.All_Aliens.add(self.SHIP)
+            self.SHIP.draw()
+        for i in range(11):
+            self.SHIP = Enemy("./images/enemy2_1.png", 20 + 50 * i, 180)
+            self.All_Aliens.add(self.SHIP)
+            self.SHIP.draw()
+        for i in range(11):
+            self.SHIP = Enemy("./images/enemy3_1.png", 20 + 50 * i, 230)
+            self.All_Aliens.add(self.SHIP)
+            self.SHIP.draw()
+        for i in range(11):
+            self.SHIP = Enemy("./images/enemy3_1.png", 20 + 50 * i, 280)
+            self.All_Aliens.add(self.SHIP)
+            self.SHIP.draw()
+
+        # All_Aliens.add(Alien_Row_1, Alien_Row_2, Alien_Row_3, Alien_Row_4, Alien_Row_5)
+        # All_Aliens.update()
+
+        pygame.display.flip()
+        # self.SHIP.update()
         self.draw_state += 1
 
     def mystery_appear(self):
@@ -405,6 +469,8 @@ class SpaceInvaders(object):
         quit = False
         self.welcome_screen() #Display welcome message
         initial=time.clock()
+        self.st = time.time()
+        self.dt = 0
         while not quit:
             
             
@@ -432,6 +498,8 @@ class SpaceInvaders(object):
                 self.block_1.draw()             # This will need replacement once damage() function is up.
                 self.block_2.draw()
                 self.block_3.draw()
+                game.SHIP.update()
+                self.dt = time.time() - self.st
                 self.update_stats()
                 self.mystery_appear()  
                 
