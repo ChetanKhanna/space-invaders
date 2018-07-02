@@ -90,7 +90,7 @@ class Bullet(pygame.sprite.Sprite):
             self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
             self.velocity = -2
         else:
-            self.image = pygame.image.load("./images/ship.png").convert_alpha()
+            self.image = pygame.image.load("./images/enemylaser.png").convert_alpha()
             self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
             self.velocity = 2
 
@@ -118,6 +118,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=(x, y))
         self.speed_H = 15
         self.speed_V = 12
+        self.bullet_group = pygame.sprite.Group()
 
 
     def update(self):
@@ -153,10 +154,17 @@ class Enemy(pygame.sprite.Sprite):
     def shoot(self):
         # not all ships will shoot at once, we need to randomly select some of them
         # and call the Missile.shoot function or something to make them shoot
-        pass
+        self.enemy_bullet = Bullet((self.rect.x - 25) , self.rect.y, ofPlayer = False)
+        self.bullet_group.add(self.enemy_bullet)
+        shoot_sound.play()
+        
 
     def draw(self):
         game.screen.blit(self.image, self.rect)
+        grplen = len(self.bullet_group.sprites())
+        if grplen:
+            self.enemy_bullet.update()
+            self.enemy_bullet.draw()
 
 class Blocker(pygame.sprite.Sprite):
     """
@@ -482,7 +490,19 @@ class SpaceInvaders(object):
                 direct=random.choice([-1,1])
                 self.mystery.start(direct)
 
-
+    def alien_shoot(self):
+        chance=random.randint(1,10001)
+        if chance > 300 and chance < 350:
+            enemy_line=[]
+            #alien=Enemy()
+            for alien in self.All_Aliens:
+                enemy_line.append(alien)
+            numaliens=len(enemy_line)
+            randalien=random.randint(0,numaliens-1)
+            enemy_line[randalien].shoot()
+            enemy_line[randalien].update()
+         
+        
     def main(self):
         quit = False
         self.welcome_screen() #Display welcome message
@@ -515,6 +535,7 @@ class SpaceInvaders(object):
                 self.block_1.draw()             # This will need replacement once damage() function is up.
                 self.block_2.draw()
                 self.block_3.draw()
+                self.alien_shoot()
                 game.SHIP.update()
                 self.dt = time.time() - self.st
                 self.update_stats()
