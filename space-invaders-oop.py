@@ -154,7 +154,7 @@ class Enemy(pygame.sprite.Sprite):
     def shoot(self):
         # not all ships will shoot at once, we need to randomly select some of them
         # and call the Missile.shoot function or something to make them shoot
-        self.enemy_bullet = Bullet((self.rect.x - 25) , self.rect.y, ofPlayer = False)
+        self.enemy_bullet = Bullet((self.rect.x + 20) , self.rect.y, ofPlayer = False)
         self.bullet_group.add(self.enemy_bullet)
         shoot_sound.play()
         
@@ -491,16 +491,14 @@ class SpaceInvaders(object):
                 self.mystery.start(direct)
 
     def alien_shoot(self):
-        chance=random.randint(1,10001)
+        chance=random.randint(1,10000)
         if chance > 300 and chance < 350:
             enemy_line=[]
-            #alien=Enemy()
             for alien in self.All_Aliens:
                 enemy_line.append(alien)
             numaliens=len(enemy_line)
             randalien=random.randint(0,numaliens-1)
             enemy_line[randalien].shoot()
-            enemy_line[randalien].update()
          
         
     def main(self):
