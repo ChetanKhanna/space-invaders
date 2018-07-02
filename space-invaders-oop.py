@@ -133,40 +133,50 @@ class Enemy(pygame.sprite.Sprite):
         self.speed_V = 12
         self.time_H = 0.75
         self.time_V = 12
+        self.move_D = False
 
     def update(self):
-        game.timer_1 += game.elapsed_time
-        game.timer_2 += game.elapsed_time
-        game.timer_3 += game.elapsed_time
-        print(game.timer_1, game.timer_2)
-        print('et :', game.elapsed_time)
+        game.timer += game.elapsed_time
+        #print(game.timer)
+        #print('et :', game.elapsed_time)
         for alien in game.All_Aliens:
-            if alien.rect.y >= 415:
-                pygame.quit()
+            if alien.rect.y >= 530:
+                pygame.quit()           ### Game_Over() to be called here!!
+            
 
-        if game.timer_2 > self.time_V:
-            self.speed_H = -(self.speed_H)
-            for alien in game.All_Aliens:
-                alien.rect.y += self.speed_V
-                alien.draw()
-            game.timer_2 -= self.time_V
-            game.timer_1 -= self.time_H
-            game.start_time = time.time()
-
-        else:
-            if game.timer_1 >= self.time_H:
+        if game.timer > self.time_H:
+            if self.move_D:
+                self.down()
+            else:
                 for alien in game.All_Aliens:
                     alien.rect.x += self.speed_H
                     alien.flip *= -1
                     alien.image = pygame.image.load(alien.images[alien.flip]).convert_alpha()
                     alien.image = pygame.transform.scale(alien.image , (35, 35)) 
                     alien.draw()
-                game.timer_1 -= self.time_H
-                game.start_time = time.time()
-
-            else:
-                for alien in game.All_Aliens:
-                    alien.draw()
+                if any(alien.rect.x > 720 for alien in game.All_Aliens) or\
+                   any(alien.rect.x < 35 for alien in game.All_Aliens):
+                    self.move_D = True
+                    self.speed_H *= -1
+                game.timer -= self.time_H
+            
+        else:
+            for alien in game.All_Aliens:
+                alien.draw()
+                
+            
+                
+    def down(self):
+        for alien in game.All_Aliens:
+            alien.rect.y += self.speed_V
+            alien.flip *= -1
+            alien.image = pygame.image.load(alien.images[alien.flip]).convert_alpha()
+            alien.image = pygame.transform.scale(alien.image , (35, 35)) 
+            alien.draw()
+        self.move_D = False
+        game.timer -= self.time_H
+            
+            
 
     def shoot(self):
         # not all ships will shoot at once, we need to randomly select some of them
@@ -413,9 +423,7 @@ class SpaceInvaders(object):
 
         ## ADD GAMEPLAY START SOUND HERE
 
-        self.timer_1 = 0
-        self.timer_2 = 0
-        self.timer_3 = 0
+        self.timer = 0
         
         self.screen.fill(BLACK)
         start_time = time.time()
@@ -527,7 +535,6 @@ class SpaceInvaders(object):
                 self.block_2.draw()
                 self.block_3.draw()
                 self.SHIP.update()
-                #self.dt = time.time() - self.st
                 self.update_stats()
                 self.mystery_appear()
                 self.mute_status(button_ctr)
