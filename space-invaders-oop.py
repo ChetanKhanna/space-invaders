@@ -13,7 +13,7 @@ YELLOW = (241, 255, 0)
 BLUE = (80, 255, 239)
 PURPLE = (203, 0, 255)
 RED = (237, 28, 36)
-ROCK = (138, 51, 36)
+ROCK = (54, 54, 54)
 
 # adding font file
 FONT = "fonts/space_invaders.ttf"
@@ -42,7 +42,7 @@ class Ship(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
         self.moving_speed = 1
         self.bullet_group = pygame.sprite.Group()
-                
+        
     def update(self, keystate):
         #Right Key
         if keystate[pygame.K_RIGHT] or keystate[pygame.K_d]:
@@ -53,7 +53,7 @@ class Ship(pygame.sprite.Sprite):
         if keystate[pygame.K_LEFT] or keystate[pygame.K_a]:
             if self.rect.x > 20:
                 self.rect.x -= self.moving_speed
-  
+
         #Shoot Key
         if (keystate[pygame.K_SPACE] or keystate[pygame.K_w]) and (len(self.bullet_group.sprites()) == 0):
             self.shoot()
@@ -321,14 +321,17 @@ class SpaceInvaders(object):
             self.live = pygame.transform.scale(self.live , (20, 20))
             self.screen.blit(self.live, (725+(i*25), 7))
         
+    
+        
+
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
         self.background = pygame.transform.scale(self.background, (800,600))
-        
-        ## ADD GAMEPLAY START SOUND HERE
         pygame.mixer.music.stop()
         pygame.mixer.music.load('./sounds/game_sound.wav')
         pygame.mixer.music.play(-1)
+        
+        ## ADD GAMEPLAY START SOUND HERE
         
         self.screen.fill(BLACK)
         start_time = time.time()
@@ -352,7 +355,7 @@ class SpaceInvaders(object):
             self.screen.fill(BLACK)
             self.background_surface.blit(self.background, (0,0))
             self.screen.blit(self.background_surface,(0,0))
-
+      
             pygame.display.flip()
 
         ### ADD all Sprites class object declaration HERE ###
@@ -368,9 +371,9 @@ class SpaceInvaders(object):
         self.block_1.draw()
         self.block_2.draw()
         self.block_3.draw()
-
+        #self.mystery=Mystery()
+        
         # Drawing ships                
-
         self.draw_state += 1
 
     def appear(self,randnum,screen,background):
@@ -463,6 +466,7 @@ class SpaceInvaders(object):
                 self.block_1.draw()             # This will need replacement once damage() function is up.
                 self.block_2.draw()
                 self.block_3.draw()
+                self.update_stats()
              
                 num=random.randint(0,100000)
                 self.appear(num,self.screen,self.background)  
@@ -470,6 +474,7 @@ class SpaceInvaders(object):
             
                  
             """ won = 1
+
                 #If user destroys all enemy ships
                 for i in range(0,11):
                     for j in range(0,5):
