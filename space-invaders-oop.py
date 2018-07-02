@@ -129,20 +129,23 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.image.load(self.images[self.flip]).convert_alpha()
         self.image = pygame.transform.scale(self.image, (35, 35))
         self.rect = self.image.get_rect(topleft=(x, y))
-        self.speed_H = 15
-        self.speed_V = 12
+        self.speed_H = 16
+        
         self.time_H = 0.75
-        self.time_V = 12
+        
         self.move_D = False
+        self.decrement_factor = 1
 
     def update(self):
         game.timer += game.elapsed_time
-        #print(game.timer)
-        #print('et :', game.elapsed_time)
+      
         for alien in game.All_Aliens:
-            if alien.rect.y >= 530:
-                pygame.quit()           ### Game_Over() to be called here!!
+            if alien.rect.y >= 500:
+                pygame.quit()
+                ## Explosion(Defender_Ship)
+                ## End_Game
             
+        print(self.time_H) ### This left so that others can check if the above code needs chages
 
         if game.timer > self.time_H:
             if self.move_D:
@@ -155,8 +158,11 @@ class Enemy(pygame.sprite.Sprite):
                     alien.image = pygame.transform.scale(alien.image , (35, 35)) 
                     alien.draw()
                 if any(alien.rect.x > 720 for alien in game.All_Aliens) or\
-                   any(alien.rect.x < 35 for alien in game.All_Aliens):
+                   any(alien.rect.x < 30 for alien in game.All_Aliens):
                     self.move_D = True
+                    self.decrement_factor += 1
+                    if self.decrement_factor % 2 == 0 and self.decrement_factor < 10:
+                        self.time_H -= 0.05
                     self.speed_H *= -1
                 game.timer -= self.time_H
             
