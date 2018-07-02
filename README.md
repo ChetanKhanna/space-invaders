@@ -1,5 +1,4 @@
 # Space Invaders
-A game that needs no introduction.
 
 ### About :
 Space Invaders is a two-dimensional fixed shooter game in which the player controls 
@@ -20,14 +19,14 @@ gradually destroyed by projectiles from the aliens and player.
 
 ### How To Play :
 
-If you have the correct version of Python and Pygame installed, you can run the program in the command prompt 
+You can run the program in the command prompt 
 
 ```
 cd SpaceInvaders
-python spaceinvaders.py
+python3 spaceinvaders.py
 ```
 
-Note: If you're using Python 3, replace the command "python" with "python3"
+Note: This Game will run only in Python3 only.
 
 
 ### Members:
