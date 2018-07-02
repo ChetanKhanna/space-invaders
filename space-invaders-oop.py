@@ -87,12 +87,12 @@ class Bullet(pygame.sprite.Sprite):
         super().__init__()
         if ofPlayer is True:
             self.image = pygame.image.load("./images/laser.png").convert_alpha()
-            self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
-            self.velocity = -2
+            self.rect = self.image.get_rect(midbottom = (x_pos, y_pos))
+            self.velocity = -3
         else:
             self.image = pygame.image.load("./images/ship.png").convert_alpha()
-            self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
-            self.velocity = 2
+            self.rect = self.image.get_rect(midbottom = (x_pos, y_pos))
+            self.velocity = 3
 
     def update(self):
         self.rect.y += self.velocity
@@ -126,7 +126,7 @@ class Enemy(pygame.sprite.Sprite):
         game.timer_3 += game.elapsed_time
 
         for alien in game.All_Aliens:
-            if alien.rect.y >= 415:
+            if alien.rect.y >= 495:
                 pygame.quit()
 
         if game.timer_2 > 1600:
@@ -165,24 +165,12 @@ class Blocker(pygame.sprite.Sprite):
     """
     def __init__(self, x, y):
         super().__init__()
-        self.x = x
-        self.y = y
+        self.image = pygame.Surface((25, 12))
+        self.image.fill(ROCK)
+        self.rect = self.image.get_rect(topleft=(x, y))
 
     def draw(self):
-        # pygame.draw.rect(screen, WHITE, [self.x, self.y, 125,  60])
-
-        # instead of making it single rectangle, distributed each
-        # rectangle into 25 smaller rectangles. Thought this may
-        # help in collision detection and we can delete smaller rectangles
-        # when a missile hits it.
-        for i in range(5):
-            for j in range(5):
-                x_pos = self.x + 25*j
-                y_pos = self.y + 12*i
-                pygame.draw.rect(game.screen, ROCK, [x_pos, y_pos, 25, 12])
-
-    def damage(self):
-        pass
+        game.screen.blit(self.image, self.rect)
 
 
 class Mystery(pygame.sprite.Sprite):
@@ -195,7 +183,6 @@ class Mystery(pygame.sprite.Sprite):
         self.image = pygame.image.load("./images/mystery.png")
         self.image = pygame.transform.scale(self.image, (75, 35))
         self.rect = self.image.get_rect(topleft=(20,40))
-        self.health=3
         self.current_status=False
 
     def start(self, direct):
@@ -208,12 +195,14 @@ class Mystery(pygame.sprite.Sprite):
 
     def update(self):
 
-        self.rect.x=self.rect.x+self.direct
+        self.rect.x= self.rect.x + self.direct
         game.screen.blit(self.image, self.rect)
 
         if self.rect.x>800 or self.rect.x<-75:
             self.current_status=False
 
+    def destroyed(self):
+        self.current_status=False
 
     '''
     def status(self,bullet):
@@ -431,16 +420,21 @@ class SpaceInvaders(object):
         self.player.draw()
 
         #Blockers
-        self.block_1 = Blocker(75,450)
-        self.block_2 = Blocker(337.5,450)
-        self.block_3 = Blocker(600, 450)
-        self.block_1.draw()
-        self.block_2.draw()
-        self.block_3.draw()
+        self.block_group = pygame.sprite.Group()
+        for i in range(8):
+            for j in range(4):
+                block_1 = Blocker(80+(15*i), 450+(12*j))
+                block_2 = Blocker(340+(15*i), 450+(12*j))
+                block_3 = Blocker(605+(15*i), 450+(12*j))
+                self.block_group.add(block_1, block_2, block_3)
+        self.block_group.draw(game.screen)
+        
+        #Mystery Ship
+        self.mystery_group = pygame.sprite.Group()
         self.mystery=Mystery()
-
+        self.mystery_group.add(self.mystery)
+        
         # Drawing ships
-
         self.All_Aliens = pygame.sprite.Group()
         for i in range(11):
             self.SHIP = Enemy("./images/enemy1_1.png", 20 + 50 * i, 80)
@@ -471,6 +465,34 @@ class SpaceInvaders(object):
 
         self.draw_state += 1
 
+    def collisions_checking(self):
+
+        #Blocker and Player's bullet
+        currentcollisions = pygame.sprite.groupcollide(self.player.bullet_group, self.block_group, True, True)
+
+        #Blocker and Enemy's bullet
+
+
+        #Enemy and Player's bullet
+        currentcollisions = pygame.sprite.groupcollide(self.player.bullet_group, self.All_Aliens, True, False)
+        if currentcollisions:
+            for value in currentcollisions.values():
+                for currentSprite in value:
+                    self.All_Aliens.remove(currentSprite)
+                break
+
+        #Mystery and Player's bullet
+        currentcollisions = pygame.sprite.groupcollide(self.player.bullet_group, self.mystery_group, True, False)
+        if currentcollisions:
+            for value in currentcollisions.values():
+                for currentSprite in value:
+                    currentSprite.destroyed()
+                break
+
+        #Blocker and Enemy
+        currentcollisions = pygame.sprite.groupcollide(self.All_Aliens, self.block_group, False, True)
+        
+    
     def mystery_appear(self):
 
         if self.mystery.current_status==True:
@@ -479,6 +501,8 @@ class SpaceInvaders(object):
         else:
             num=random.randint(0,100000)
             if num > 350 and num < 380 :
+                #self.mystery=Mystery()
+                self.mystery_group.add(self.mystery)
                 direct=random.choice([-1,1])
                 self.mystery.start(direct)
 
@@ -512,16 +536,14 @@ class SpaceInvaders(object):
                 ### CALL All updating functions here ###
                 self.screen.blit(self.background,(0,0))
                 self.player.update(keystate)
-                self.block_1.draw()             # This will need replacement once damage() function is up.
-                self.block_2.draw()
-                self.block_3.draw()
+                self.block_group.draw(game.screen)
                 game.SHIP.update()
                 self.dt = time.time() - self.st
                 self.update_stats()
                 self.mystery_appear()
                 self.mute_status(button_ctr)
                 button_ctr=self.mute_status(button_ctr)            
-
+                self.collisions_checking()
             """ won = 1
 
                 #If user destroys all enemy ships
