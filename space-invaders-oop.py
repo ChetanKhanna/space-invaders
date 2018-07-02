@@ -16,6 +16,7 @@ RED = (237, 28, 36)
 ROCK = (54, 54, 54)
 
 
+timer = 0
 # adding font file
 FONT = "fonts/space_invaders.ttf"
 #Loading Alien images
@@ -121,7 +122,7 @@ class Enemy(pygame.sprite.Sprite):
     properties. We need to create a list of
     lists of objects of this class Aliens probably.
     """
-
+    
     def __init__(self, images, x, y):
         super().__init__()
         self.flip = -1
@@ -181,9 +182,7 @@ class Enemy(pygame.sprite.Sprite):
             alien.draw()
         self.move_D = False
         game.timer -= self.time_H
-            
-            
-
+           
     def shoot(self):
         # not all ships will shoot at once, we need to randomly select some of them
         # and call the Missile.shoot function or something to make them shoot
@@ -415,10 +414,10 @@ class SpaceInvaders(object):
             self.live = pygame.transform.scale(self.live , (20, 20))
             self.screen.blit(self.live, (670+(i*25), 7))
 
-        #button=pygame.image.load("./images/mutebutton.png")
-        #button=pygame.transform.scale(button,(30,30))
-        #self.screen.blit(button, (750,5))
 
+        button=pygame.image.load("./images/mutebutton.png")
+        button=pygame.transform.scale(button,(30,30))
+        self.screen.blit(button, (750,5))
 
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
@@ -430,6 +429,7 @@ class SpaceInvaders(object):
         ## ADD GAMEPLAY START SOUND HERE
 
         self.timer = 0
+
         
         self.screen.fill(BLACK)
         start_time = time.time()
@@ -515,6 +515,7 @@ class SpaceInvaders(object):
         self.welcome_screen() #Display welcome message
         self.start_time = time.time()
         self.elapsed_time = time.time() - self.start_time
+
         button_ctr=0
         while not quit:
 
@@ -524,6 +525,7 @@ class SpaceInvaders(object):
                         quit = True
                     if event.type == pygame.KEYDOWN:
                         self.start_game()
+
                         self.elased_time = 0
 
             if self.draw_state > 0:
@@ -534,6 +536,7 @@ class SpaceInvaders(object):
                         
                 self.start_time = time.time()        
                 keystate = pygame.key.get_pressed()
+
                 ### CALL All updating functions here ###
                 self.screen.blit(self.background,(0,0))
                 self.player.update(keystate)
@@ -545,7 +548,9 @@ class SpaceInvaders(object):
                 self.mystery_appear()
                 self.mute_status(button_ctr)
                 button_ctr=self.mute_status(button_ctr)            
+
                 self.elapsed_time = time.time() - self.start_time
+
             """ won = 1
 
                 #If user destroys all enemy ships
