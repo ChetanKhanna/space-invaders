@@ -133,16 +133,19 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.image.load(self.images[self.flip]).convert_alpha()
         self.image = pygame.transform.scale(self.image, (35, 35))
         self.rect = self.image.get_rect(topleft=(x, y))
+
         self.speed_H = 16
         self.speed_V = 12
         self.time_H = 0.75
         self.move_D = False
         self.bullet_group = pygame.sprite.Group()
 
+
     def update(self):
         game.timer += game.elapsed_time
         self.time_H = 0.40 + len(game.All_Aliens)/150
         for alien in game.All_Aliens:
+
             if alien.rect.y >= 495:
                 pygame.quit()
                 ## Explosion(Defender_Ship)
@@ -153,6 +156,7 @@ class Enemy(pygame.sprite.Sprite):
         if game.timer > self.time_H:
             if self.move_D:
                 self.down()
+
             else:
                 for alien in game.All_Aliens:
                     alien.rect.x += self.speed_H
@@ -476,6 +480,14 @@ class SpaceInvaders(object):
         button=pygame.transform.scale(button,(30,30))
         self.screen.blit(button, (750,5))
 
+
+    def gameOver(self):
+
+        self.gameOverText = pygame.font.Font(FONT, 100)
+        textsurface = self.gameOverText.render('GAME OVER', False, WHITE)
+        self.screen.blit(textsurface, (100, 220))
+
+
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
         self.background = pygame.transform.scale(self.background, (800,600))
@@ -713,8 +725,15 @@ class SpaceInvaders(object):
     def main(self):
         quit = False
         self.welcome_screen() #Display welcome message
+
+
+        initial=time.clock()
+        self.st = time.time()
+        self.dt = 0
+
         self.start_time = time.time()
         self.elapsed_time = time.time() - self.start_time
+
 
         button_ctr=0
         while not quit:
@@ -746,10 +765,28 @@ class SpaceInvaders(object):
                 self.update_stats()
                 self.mystery_appear()
                 self.mute_status(button_ctr)
+
                 button_ctr=self.mute_status(button_ctr)            
                 self.collisions_checking()
                 self.explosion_group.update(time.time())
                 self.elapsed_time = time.time() - self.start_time
+
+                if self.lives == 0:
+
+                    self.gameOver()
+                    game_over_show_time = time.time()
+                    remove_game_over_screen = False
+                    while not remove_game_over_screen:
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                pygame.quit()
+                        if time.time() - game_over_show_time <= 2:
+                            self.gameOver()
+                        else:
+                            remove_game_over_screen = True
+
+
+
 
             """ won = 1
                 #If user destroys all enemy ships
