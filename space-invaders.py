@@ -848,16 +848,6 @@ class SpaceInvaders(object):
                 if self.lives == 0:
                     self.gameOver()
 
-
-            """ won = 1
-                #If user destroys all enemy ships
-                for i in range(0,11):
-                    for j in range(0,5):
-                        if enemy_ship[i][j]==1: #Checking if any ship is left
-                            won = 0
-                if won == 1:
-                    win_message()#Displaying victory message by calling win_message() function
-            """
             pygame.display.flip() #Update portions of the screen for software displays
             #pygame.display.update() #Update portions of the screen for software displays
 
