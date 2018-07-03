@@ -112,8 +112,10 @@ class Enemy(pygame.sprite.Sprite):
     lists of objects of this class Aliens probably.
     """
 
-    def __init__(self, image, x, y):
+    def __init__(self, image, x, y, row, col):
         super().__init__()
+        self.row=row
+        self.col=col
         self.image = pygame.image.load(image).convert_alpha()
         self.image = pygame.transform.scale(self.image, (35, 35))
         self.rect = self.image.get_rect(topleft=(x, y))
@@ -504,27 +506,27 @@ class SpaceInvaders(object):
         self.Aliens_3 = pygame.sprite.Group()
         
         for i in range(11):
-            self.SHIP = Enemy("./images/enemy1_1.png", 20 + 50 * i, 80)
+            self.SHIP = Enemy("./images/enemy1_1.png", 20 + 50 * i, 80, 0, i)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_1.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
-            self.SHIP = Enemy("./images/enemy2_1.png", 20 + 50 * i, 130)
+            self.SHIP = Enemy("./images/enemy2_1.png", 20 + 50 * i, 130, 1, i)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_2.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
-            self.SHIP = Enemy("./images/enemy2_1.png", 20 + 50 * i, 180)
+            self.SHIP = Enemy("./images/enemy2_1.png", 20 + 50 * i, 180, 2, i)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_2.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
-            self.SHIP = Enemy("./images/enemy3_1.png", 20 + 50 * i, 230)
+            self.SHIP = Enemy("./images/enemy3_1.png", 20 + 50 * i, 230, 3, i)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
-            self.SHIP = Enemy("./images/enemy3_1.png", 20 + 50 * i, 280)
+            self.SHIP = Enemy("./images/enemy3_1.png", 20 + 50 * i, 280, 4, i)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
             self.SHIP.draw()
@@ -560,19 +562,21 @@ class SpaceInvaders(object):
                         self.explosion_group.add(exp)
                         self.current_score += 30
                         self.Aliens_1.remove(currentSprite)
+                        ships[currentSprite.row][currentSprite.col]=0
 
                     if self.Aliens_2.has(currentSprite):
                         exp = Explosion(2, 20, currentSprite.rect.x, currentSprite.rect.y)
                         self.explosion_group.add(exp)
                         self.current_score += 20
                         self.Aliens_2.remove(currentSprite)
+                        ships[currentSprite.row][currentSprite.col]=0
                     
                     if self.Aliens_3.has(currentSprite):
                         exp = Explosion(3, 10, currentSprite.rect.x, currentSprite.rect.y)
                         self.explosion_group.add(exp)
                         self.current_score += 10
                         self.Aliens_3.remove(currentSprite)
-                            
+                        ships[currentSprite.row][currentSprite.col]=0
 
                     self.All_Aliens.remove(currentSprite)
                 break
