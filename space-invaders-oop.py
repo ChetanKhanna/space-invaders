@@ -385,6 +385,10 @@ class SpaceInvaders(object):
         button=pygame.transform.scale(button,(30,30))
         self.screen.blit(button, (750,5))
 
+    def gameOver(self):
+        self.gameOverText = pygame.font.Font(FONT, 100)
+        textsurface = self.gameOverText.render('GAME OVER', False, WHITE)
+        self.screen.blit(textsurface, (100, 220))
 
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
@@ -486,6 +490,7 @@ class SpaceInvaders(object):
     def main(self):
         quit = False
         self.welcome_screen() #Display welcome message
+        #self.gameOver()  #just checking game over screen
         initial=time.clock()
         self.st = time.time()
         self.dt = 0
@@ -520,7 +525,21 @@ class SpaceInvaders(object):
                 self.update_stats()
                 self.mystery_appear()
                 self.mute_status(button_ctr)
-                button_ctr=self.mute_status(button_ctr)            
+                button_ctr=self.mute_status(button_ctr)
+
+                if len(self.All_Aliens) == 0:
+                    self.screen.fill(BLACK)
+                    self.gameOver()
+                    game_over_show_time = time.time()
+                    remove_game_over_screen = False
+                    while not remove_game_over_screen:
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                pygame.quit()
+                        if time.time() - game_over_show_time <= 2:
+                            self.gameOver()
+                        else:
+                            remove_game_over_screen = True
 
             """ won = 1
 
