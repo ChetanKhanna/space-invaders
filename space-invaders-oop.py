@@ -274,6 +274,7 @@ class SpaceInvaders(object):
         self.current_player = 1
         self.draw_state = 0
         self.background = pygame.image.load("./images/background.png").convert_alpha()
+        self.alienlist=[]
         #other variables will also be required
 
         #Initializing font module
@@ -452,22 +453,27 @@ class SpaceInvaders(object):
         self.All_Aliens = pygame.sprite.Group()
         for i in range(11):
             self.SHIP = Enemy("./images/enemy1_1.png", 20 + 50 * i, 80)
+            self.alienlist.append(self.SHIP)
             self.All_Aliens.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
             self.SHIP = Enemy("./images/enemy2_1.png", 20 + 50 * i, 130)
+            self.alienlist.append(self.SHIP)
             self.All_Aliens.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
             self.SHIP = Enemy("./images/enemy2_1.png", 20 + 50 * i, 180)
+            self.alienlist.append(self.SHIP)
             self.All_Aliens.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
             self.SHIP = Enemy("./images/enemy3_1.png", 20 + 50 * i, 230)
+            self.alienlist.append(self.SHIP)
             self.All_Aliens.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
             self.SHIP = Enemy("./images/enemy3_1.png", 20 + 50 * i, 280)
+            self.alienlist.append(self.SHIP)
             self.All_Aliens.add(self.SHIP)
             self.SHIP.draw()
 
@@ -493,7 +499,7 @@ class SpaceInvaders(object):
     def alien_shoot(self):
         chance=random.randint(1,10000)
         if chance > 300 and chance < 350:
-            alienlist=self.All_Aliens.sprites()
+            #alienlist=self.All_Aliens.sprites()
             numaliens=55
             randalien=random.randint(0,numaliens-12)
             row=randalien/11
@@ -509,14 +515,14 @@ class SpaceInvaders(object):
                         for j in range(0,col):
                             if ships[i][j]==0:
                                 randalien=randalien-1
-                    alienlist[randalien].shoot()
+                    self.alienlist[randalien].shoot()
                     return
                 randalien=random.randint(0,numaliens-12)
             for i in range(0,row):
                 for j in range(0,col):
                     if ships[i][j]==0:
                         randalien=randalien-1
-            alienlist[randalien].shoot()
+            self.alienlist[randalien].shoot()
             
             
     def main(self):
