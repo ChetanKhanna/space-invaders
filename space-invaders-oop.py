@@ -56,7 +56,6 @@ class Ship(pygame.sprite.Sprite):
         self.image = pygame.image.load("./images/ship.png").convert_alpha()
         self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
         self.moving_speed = 2
-        self.bullet_group = pygame.sprite.Group()
 
     def update(self, keystate):
         #Right Key
@@ -69,26 +68,11 @@ class Ship(pygame.sprite.Sprite):
             if self.rect.x > 20:
                 self.rect.x -= self.moving_speed
 
-        #Shoot Key
-        if (keystate[pygame.K_SPACE] or keystate[pygame.K_w]) and (len(self.bullet_group.sprites()) == 0):
-            self.shoot()
-
         self.draw()
 
     def draw(self):
         #Drawing the Ship
         game.screen.blit(self.image, self.rect)
-
-        grplen = len(self.bullet_group.sprites())
-        if grplen:
-            self.player_bullet.update()
-            self.player_bullet.draw()
-
-    def shoot(self):
-        shoot_sound.play()
-        self.player_bullet = Bullet((self.rect.x + 25) , self.rect.y, ofPlayer = True)
-        self.bullet_group.add(self.player_bullet)
-        shoot_sound.play()
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -111,7 +95,7 @@ class Bullet(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.y += self.velocity
-        if self.rect.y < 25:
+        if self.rect.y < 25 or self.rect.y > 600:
             self.kill()
         self.draw()
 
@@ -267,7 +251,8 @@ class Explosion(pygame.sprite.Sprite):
             game.screen.blit(self.textsurface,(self.x + 20, self.y + 6))
 
         elif code == 5:
-            pass
+            self.image = pygame.image.load("./images/ship.png")
+            self.rect = self.image.get_rect(topleft=(self.x, self.y))
 
         else:
             if code == 1:
@@ -296,7 +281,10 @@ class Explosion(pygame.sprite.Sprite):
                 self.kill()
         
         elif self.code == 5:
-            pass
+            if currentTime - self.timer > 0.3 and currentTime - self.timer <= 0.6:
+                game.screen.blit(self.image, self.rect)
+            if currentTime - self.timer > 900:
+                self.kill()
 
         else:
             if currentTime - self.timer <= 0.1:
@@ -346,7 +334,7 @@ class SpaceInvaders(object):
         self.current_player = 1
         self.draw_state = 0
         self.background = pygame.image.load("./images/background.png").convert_alpha()
-        self.alienstack=[]
+        self.check = False
         #other variables will also be required
 
         #Initializing font module
@@ -462,10 +450,18 @@ class SpaceInvaders(object):
             self.live = pygame.transform.scale(self.live , (20, 20))
             self.screen.blit(self.live, (670+(i*25), 7))
 
-
+        #Mute Button
         button=pygame.image.load("./images/mutebutton.png")
         button=pygame.transform.scale(button,(30,30))
         self.screen.blit(button, (750,5))
+
+
+    def shoot(self):
+        shoot_sound.play()
+        self.player_bullet = Bullet((self.player.rect.x + 25) , self.player.rect.y, ofPlayer = True)
+        self.bullet_group.add(self.player_bullet)
+        shoot_sound.play()
+
 
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
@@ -509,6 +505,8 @@ class SpaceInvaders(object):
         #Defender Ship
         self.player = Ship(375, 530)
         self.player.draw()
+        self.player_group = pygame.sprite.Group()
+        self.player_group.add(self.player)
 
         #Blockers
         self.block_group = pygame.sprite.Group()
@@ -572,6 +570,9 @@ class SpaceInvaders(object):
         #Explosion Group
         self.explosion_group = pygame.sprite.Group()
 
+        #Player Bullet Group
+        self.bullet_group = pygame.sprite.Group()
+
         #Enemy Bullet Group
         self.enemy_bullets = pygame.sprite.Group()
 
@@ -580,15 +581,18 @@ class SpaceInvaders(object):
         self.draw_state += 1
 
     def collisions_checking(self):
+        
+        #Enemy's Bullet and Player's bullet
+        currentcollisions = pygame.sprite.groupcollide(self.bullet_group, self.enemy_bullets, True, True)
 
         #Blocker and Player's bullet
-        currentcollisions = pygame.sprite.groupcollide(self.player.bullet_group, self.block_group, True, True)
+        currentcollisions = pygame.sprite.groupcollide(self.bullet_group, self.block_group, True, True)
 
         #Blocker and Enemy's bullet
-
+        currentcollisions = pygame.sprite.groupcollide(self.enemy_bullets, self.block_group, True, True)
 
         #Enemy and Player's bullet
-        currentcollisions = pygame.sprite.groupcollide(self.player.bullet_group, self.All_Aliens, True, False)
+        currentcollisions = pygame.sprite.groupcollide(self.bullet_group, self.All_Aliens, True, False)
         if currentcollisions:
             for value in currentcollisions.values():
                 for currentSprite in value:
@@ -628,8 +632,26 @@ class SpaceInvaders(object):
                     currentSprite.kill()
                 break
 
+        #Player and Enemy's bullet
+        currentcollisions = pygame.sprite.groupcollide(self.enemy_bullets, self.player_group, True, False)
+        if currentcollisions:
+            for value in currentcollisions.values():
+                for currentSprite in value:
+                    killed_sound=pygame.mixer.Sound('./sounds/invaderkilled.wav')
+                    killed_sound.play()
+
+                    exp = Explosion(5, 10, currentSprite.rect.x, currentSprite.rect.y)
+                    self.explosion_group.add(exp)
+
+                    self.killed_time = time.time()
+                    self.check = True
+                    
+                    self.lives-=1
+                    self.player_group.remove(currentSprite)
+                break
+        
         #Mystery and Player's bullet
-        currentcollisions = pygame.sprite.groupcollide(self.player.bullet_group, self.mystery_group, True, False)
+        currentcollisions = pygame.sprite.groupcollide(self.bullet_group, self.mystery_group, True, False)
         if currentcollisions:
             for value in currentcollisions.values():
                 for currentSprite in value:
@@ -692,13 +714,30 @@ class SpaceInvaders(object):
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT: #If user quits game
                         quit = True
+                    #Shoot Key
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE and (len(self.bullet_group.sprites()) == 0):
+                            self.shoot()
                         
                 self.start_time = time.time()        
                 keystate = pygame.key.get_pressed()
 
                 ### CALL All updating functions here ###
                 self.screen.blit(self.background,(0,0))
-                self.player.update(keystate)
+
+                if self.check is True:
+                    if self.check is True:
+                        if time.time() - self.killed_time > 0.9:
+                            self.player_group.add(self.player)
+                            self.check = False
+                if self.check is False:
+                    self.player.update(keystate)
+
+                grplen = len(self.bullet_group.sprites())
+                if grplen:
+                    self.player_bullet.update()
+                    self.player_bullet.draw()
+                
                 self.block_group.draw(game.screen)
                 self.alien_shoot()
                 self.SHIP.update()
