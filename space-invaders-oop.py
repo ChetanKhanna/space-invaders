@@ -13,11 +13,23 @@ YELLOW = (241, 255, 0)
 BLUE = (80, 255, 239)
 PURPLE = (203, 0, 255)
 RED = (237, 28, 36)
-ROCK = (138, 51, 36)
+ROCK = (54, 54, 54)
+
 
 timer = 0
 # adding font file
 FONT = "fonts/space_invaders.ttf"
+#Loading Alien images
+AlienImages = {"image1_1" : "./images/enemy1_1.png",
+               "image1_2" : "./images/enemy1_2.png",
+               "image2_1" : "./images/enemy2_1.png",
+               "image2_2" : "./images/enemy2_2.png",
+               "image3_1" : "./images/enemy3_1.png",
+               "image3_2" : "./images/enemy3_2.png"
+              }
+Alien1 = {1 : AlienImages["image1_1"], -1 : AlienImages["image1_2"]}
+Alien2 = {1 : AlienImages["image2_1"], -1 : AlienImages["image2_2"]}
+Alien3 = {1 : AlienImages["image3_1"], -1 : AlienImages["image3_2"]}
 # Initializing game sounds
 pygame.mixer.init(frequency=44100, channels=1, buffer=512)
 shoot_sound=pygame.mixer.Sound('./sounds/shoot.wav')
@@ -112,47 +124,63 @@ class Enemy(pygame.sprite.Sprite):
     lists of objects of this class Aliens probably.
     """
 
-    def __init__(self, image, x, y, row, col):
+    def __init__(self, images, x, y, row, col):
         super().__init__()
         self.row=row
         self.col=col
-        self.image = pygame.image.load(image).convert_alpha()
+        self.flip = -1
+        self.images = images
+        self.image = pygame.image.load(self.images[self.flip]).convert_alpha(
         self.image = pygame.transform.scale(self.image, (35, 35))
         self.rect = self.image.get_rect(topleft=(x, y))
-        self.speed_H = 15
+        self.speed_H = 16
         self.speed_V = 12
-
+        self.time_H = 0.75
+        self.move_D = False
 
     def update(self):
-        game.timer_1 += game.elapsed_time
-        game.timer_2 += game.elapsed_time
-        game.timer_3 += game.elapsed_time
-
+        game.timer += game.elapsed_time
+        self.time_H = 0.40 + len(game.All_Aliens)
         for alien in game.All_Aliens:
             if alien.rect.y >= 495:
                 pygame.quit()
+                ## Explosion(Defender_Ship)
+                ## End_Game
+            
+        #print(self.time_H) ### This left so that others can check if the above code needs chages
 
-        if game.timer_2 > 1600:
-            self.speed_H = -(self.speed_H)
-            for alien in game.All_Aliens:
-                alien.rect.y += self.speed_V
-                alien.draw()
-            game.timer_2 -= 1600
-            game.timer_1 -= 100  ## To give a pause
-            game.start_time = time.time()
-
-        else:
-            if game.timer_1 >= 100:
-                for alien in game.All_Aliens:
-                    alien.rect.x += self.speed_H
-                    alien.draw()
-                game.timer_1 -= 100
-                game.start_time = time.time()
-
+        if game.timer > self.time_H:
+            if self.move_D:
+                self.down()
             else:
                 for alien in game.All_Aliens:
+                    alien.rect.x += self.speed_H
+                    alien.flip *= -1
+                    alien.image = pygame.image.load(alien.images[alien.flip]).convert_alpha()
+                    alien.image = pygame.transform.scale(alien.image , (35, 35)) 
                     alien.draw()
-
+                if any(alien.rect.x > 720 for alien in game.All_Aliens) or\
+                   any(alien.rect.x < 30 for alien in game.All_Aliens):
+                    self.move_D = True
+                    self.speed_H *= -1
+                game.timer -= self.time_H
+            
+        else:
+            for alien in game.All_Aliens:
+                alien.draw()
+                
+            
+                
+    def down(self):
+        for alien in game.All_Aliens:
+            alien.rect.y += self.speed_V
+            alien.flip *= -1
+            alien.image = pygame.image.load(alien.images[alien.flip]).convert_alpha()
+            alien.image = pygame.transform.scale(alien.image , (35, 35)) 
+            alien.draw()
+        self.move_D = False
+        game.timer -= self.time_H
+           
     def shoot(self):
         # not all ships will shoot at once, we need to randomly select some of them
         # and call the Missile.shoot function or something to make them shoot
@@ -435,10 +463,10 @@ class SpaceInvaders(object):
             self.live = pygame.transform.scale(self.live , (20, 20))
             self.screen.blit(self.live, (670+(i*25), 7))
 
+
         button=pygame.image.load("./images/mutebutton.png")
         button=pygame.transform.scale(button,(30,30))
         self.screen.blit(button, (750,5))
-
 
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
@@ -449,9 +477,8 @@ class SpaceInvaders(object):
 
         ## ADD GAMEPLAY START SOUND HERE
 
-        self.timer_1 = 0
-        self.timer_2 = 0
-        self.timer_3 = 0
+        self.timer = 0
+
         
         self.screen.fill(BLACK)
         start_time = time.time()
@@ -506,40 +533,36 @@ class SpaceInvaders(object):
         self.Aliens_3 = pygame.sprite.Group()
         
         for i in range(11):
-            self.SHIP = Enemy("./images/enemy1_1.png", 20 + 50 * i, 80, 0, i)
+            self.SHIP = Enemy(Alien1, 20 + 50 * i, 80)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_1.add(self.SHIP)
-            self.SHIP.draw()
+            self.SHIP.draw()    
         for i in range(11):
-            self.SHIP = Enemy("./images/enemy2_1.png", 20 + 50 * i, 130, 1, i)
+            self.SHIP = Enemy(Alien2, 20 + 50 * i, 130)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_2.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
-            self.SHIP = Enemy("./images/enemy2_1.png", 20 + 50 * i, 180, 2, i)
+            self.SHIP = Enemy(Alien2, 20 + 50 * i, 180)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_2.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
-            self.SHIP = Enemy("./images/enemy3_1.png", 20 + 50 * i, 230, 3, i)
+            self.SHIP = Enemy(Alien3, 20 + 50 * i, 230)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
-            self.SHIP = Enemy("./images/enemy3_1.png", 20 + 50 * i, 280, 4, i)
+            self.SHIP = Enemy(Alien3, 20 + 50 * i, 280)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
-            self.SHIP.draw()
-
-        # All_Aliens.add(Alien_Row_1, Alien_Row_2, Alien_Row_3, Alien_Row_4, Alien_Row_5)
-        # All_Aliens.update()
+            self.SHIP.draw()       
 
         #Explosion Group
         self.explosion_group = pygame.sprite.Group()
 
         pygame.display.flip()
-        # self.SHIP.update()
-
+        
         self.draw_state += 1
 
     def collisions_checking(self):
@@ -616,9 +639,9 @@ class SpaceInvaders(object):
     def main(self):
         quit = False
         self.welcome_screen() #Display welcome message
-        initial=time.clock()
-        self.st = time.time()
-        self.dt = 0
+        self.start_time = time.time()
+        self.elapsed_time = time.time() - self.start_time
+
         button_ctr=0
         while not quit:
 
@@ -629,28 +652,29 @@ class SpaceInvaders(object):
                     if event.type == pygame.KEYDOWN:
                         self.start_game()
 
-
-
+                        self.elased_time = 0
 
             if self.draw_state > 0:
                 #Updating Ship's location
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT: #If user quits game
                         quit = True
+                        
+                self.start_time = time.time()        
                 keystate = pygame.key.get_pressed()
 
                 ### CALL All updating functions here ###
                 self.screen.blit(self.background,(0,0))
                 self.player.update(keystate)
                 self.block_group.draw(game.screen)
-                game.SHIP.update()
-                self.dt = time.time() - self.st
+                self.SHIP.update()
                 self.update_stats()
                 self.mystery_appear()
                 self.mute_status(button_ctr)
                 button_ctr=self.mute_status(button_ctr)            
                 self.collisions_checking()
                 self.explosion_group.update(time.time())
+                self.elapsed_time = time.time() - self.start_time
 
             """ won = 1
 
