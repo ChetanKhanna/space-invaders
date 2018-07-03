@@ -129,13 +129,9 @@ class Enemy(pygame.sprite.Sprite):
         game.timer += game.elapsed_time
         self.time_H = 0.40 + len(game.All_Aliens)/150
         for alien in game.All_Aliens:
-
             if alien.rect.y >= 495:
+                game.gameOver()
                 pygame.quit()
-                ## Explosion(Defender_Ship)
-                ## End_Game
-
-        #print(self.time_H) ### This left so that others can check if the above code needs chages
 
         if game.timer > self.time_H:
             if self.move_D:
@@ -534,16 +530,20 @@ class SpaceInvaders(object):
 
 
     def gameOver(self):
-        self.screen.fill(BLACK)
-        t1 = time.time()
-        t2 = time.time() - t1
-        while t2 < 0.5:
-            pygame.mixer.music.stop()
-            game_oversound=pygame.mixer.Sound('./sounds/Game_Over.wav')
-            game_oversound.play()    
+        self.quit = False
+        self.titleText1 = pygame.font.Font(FONT, 60)
+        pygame.mixer.music.stop()
+        game_oversound=pygame.mixer.Sound('./sounds/Game_Over.wav')
+        game_oversound.play(-1)
+        while not self.quit:
+            self.screen.fill(BLACK)
             textsurface = self.titleText1.render('GAME OVER', False, WHITE)
-            self.screen.blit(textsurface, (300, 300))
-            t2 = time.time() - t1    
+            self.screen.blit(textsurface, (220, 230))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: #If user quits game
+                    self.quit = True
+            pygame.display.flip()
+
     
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
@@ -776,7 +776,7 @@ class SpaceInvaders(object):
 
 
     def main(self):
-        quit = False
+        self.quit = False
         self.welcome_screen() #Display welcome message
 
 
@@ -789,12 +789,12 @@ class SpaceInvaders(object):
 
 
         button_ctr=0
-        while not quit:
+        while not self.quit:
 
             if self.draw_state == 0:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT: #If user quits game
-                        quit = True
+                        self.quit = True
                     if event.type == pygame.KEYDOWN:
                         self.start_game()
 
@@ -804,7 +804,7 @@ class SpaceInvaders(object):
                 #Updating Ship's location
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT: #If user quits game
-                        quit = True
+                        self.quit = True
                     #Shoot Key
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE and (len(self.bullet_group.sprites()) == 0):
