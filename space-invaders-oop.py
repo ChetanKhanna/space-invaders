@@ -495,36 +495,30 @@ class SpaceInvaders(object):
         if chance > 300 and chance < 350:
             alienlist=self.All_Aliens.sprites()
             numaliens=55
-            randalien=random.randint(0,numaliens-1)
+            randalien=random.randint(0,numaliens-12)
             row=randalien/11
             row=int(row)
             col=randalien%11
-            if row==0 and ships[row][col]==1:
-                for i in range(0,row):
-                    for j in range(0,col):
-                        if ships[i][j]==0:
-                            randalien=randalien+1
-                alienlist[randalien].shoot()
-                return
-            while ships[row-1][col]!=0 or ships[row][col]==0:
+            while ships[row+1][col]==1 or ships[row][col]==0:
                 randalien=random.randint(0,numaliens-1)
                 row=randalien/11
                 row=int(row)
                 col=randalien%11
-                if row==0 and ships[row][col]==1:
+                if row==4 and ships[row][col]==1:
                     for i in range(0,row):
                         for j in range(0,col):
                             if ships[i][j]==0:
                                 randalien=randalien+1
                     alienlist[randalien].shoot()
                     return
+                randalien=random.randint(0,numaliens-12)
             for i in range(0,row):
-                    for j in range(0,col):
-                        if ships[i][j]==0:
-                            randalien=randalien+1
+                for j in range(0,col):
+                    if ships[i][j]==0:
+                        randalien=randalien+1
             alienlist[randalien].shoot()
-         
-        
+            
+            
     def main(self):
         quit = False
         self.welcome_screen() #Display welcome message
