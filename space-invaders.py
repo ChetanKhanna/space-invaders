@@ -534,11 +534,15 @@ class SpaceInvaders(object):
 
 
     def gameOver(self):
-
-        self.gameOverText = pygame.font.Font(FONT, 100)
-        textsurface = self.gameOverText.render('GAME OVER', False, WHITE)
-        self.screen.blit(textsurface, (100, 220))
-
+    
+        self.screen.fill(BLACK)
+        t1 = time.time()
+        t2 = time.time() - t1
+        while t2 < 0.5:    
+            textsurface = self.titleText1.render('GAME OVER', False, WHITE)
+            self.screen.blit(textsurface, (300, 300))
+            t2 = time.time() - t1    
+    
 
     def start_game(self):
         self.background = pygame.image.load("./images/background.png").convert_alpha()
@@ -837,22 +841,13 @@ class SpaceInvaders(object):
                 self.explosion_group.update(time.time())
                 self.elapsed_time = time.time() - self.start_time
 
-                if self.lives == 0:
-
-                    self.gameOver()
-                    game_over_show_time = time.time()
-                    remove_game_over_screen = False
-                    while not remove_game_over_screen:
-                        for event in pygame.event.get():
-                            if event.type == pygame.QUIT:
-                                pygame.quit()
-                        if time.time() - game_over_show_time <= 2:
-                            self.gameOver()
-                        else:
-                            remove_game_over_screen = True
-                            
                 if len(game.All_Aliens) == 0:
                     self.game_reset()
+                
+                if self.lives == 0:
+                    self.gameOver()
+                            
+                
 
 
 
