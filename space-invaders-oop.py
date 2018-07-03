@@ -30,9 +30,11 @@ AlienImages = {"image1_1" : "./images/enemy1_1.png",
 Alien1 = {1 : AlienImages["image1_1"], -1 : AlienImages["image1_2"]}
 Alien2 = {1 : AlienImages["image2_1"], -1 : AlienImages["image2_2"]}
 Alien3 = {1 : AlienImages["image3_1"], -1 : AlienImages["image3_2"]}
+
 # Initializing game sounds
 pygame.mixer.init(frequency=44100, channels=1, buffer=512)
 shoot_sound=pygame.mixer.Sound('./sounds/shoot.wav')
+
 #List to store enemy ships
 ships = [
     [1,1,1,1,1,1,1,1,1,1,1],
@@ -137,8 +139,7 @@ class Enemy(pygame.sprite.Sprite):
         self.speed_V = 12
         self.time_H = 0.75
         self.move_D = False
-        self.bullet_group = pygame.sprite.Group()
-
+        
     def update(self):
         game.timer += game.elapsed_time
         self.time_H = 0.40 + len(game.All_Aliens)/150
@@ -181,20 +182,10 @@ class Enemy(pygame.sprite.Sprite):
             alien.draw()
         self.move_D = False
         game.timer -= self.time_H
-           
-    def shoot(self):
-        # not all ships will shoot at once, we need to randomly select some of them
-        # and call the Missile.shoot function or something to make them shoot
-        self.enemy_bullet = Bullet((self.rect.x +18) , (self.rect.y+18) , ofPlayer = False)
-        self.bullet_group.add(self.enemy_bullet)
-        shoot_sound.play()
 
     def draw(self):
         game.screen.blit(self.image, self.rect)
-        grplen = len(self.bullet_group.sprites())
-        if grplen:
-            self.enemy_bullet.update()
-            self.enemy_bullet.draw()
+
 
 class Blocker(pygame.sprite.Sprite):
     """
@@ -355,7 +346,7 @@ class SpaceInvaders(object):
         self.current_player = 1
         self.draw_state = 0
         self.background = pygame.image.load("./images/background.png").convert_alpha()
-        self.alienlist=[]
+        self.alienstack=[]
         #other variables will also be required
 
         #Initializing font module
@@ -540,39 +531,49 @@ class SpaceInvaders(object):
         self.Aliens_2 = pygame.sprite.Group()
         self.Aliens_3 = pygame.sprite.Group()
         
+        self.frontRow = pygame.sprite.Group()
+        
         for i in range(11):
-            self.SHIP = Enemy(Alien1, 20 + 50 * i, 80, 4, i)
-            self.alienlist.append(self.SHIP)
+            self.SHIP = Enemy(Alien1, 20 + 50 * i, 80, 0, i)
+            ships[0][i] = self.SHIP
             self.All_Aliens.add(self.SHIP)
             self.Aliens_1.add(self.SHIP)
-            self.SHIP.draw()   
+            self.SHIP.draw()
+        
         for i in range(11):
-            self.SHIP = Enemy(Alien2, 20 + 50 * i, 130, 3, i)
-            self.alienlist.append(self.SHIP)
+            self.SHIP = Enemy(Alien2, 20 + 50 * i, 130, 1, i)
+            ships[1][i] = self.SHIP
             self.All_Aliens.add(self.SHIP)
             self.Aliens_2.add(self.SHIP)
             self.SHIP.draw()
+        
         for i in range(11):
             self.SHIP = Enemy(Alien2, 20 + 50 * i, 180, 2, i)
-            self.alienlist.append(self.SHIP)
+            ships[2][i] = self.SHIP
             self.All_Aliens.add(self.SHIP)
             self.Aliens_2.add(self.SHIP)
             self.SHIP.draw()
+        
         for i in range(11):
-            self.SHIP = Enemy(Alien3, 20 + 50 * i, 230, 1, i)
-            self.alienlist.append(self.SHIP)
+            self.SHIP = Enemy(Alien3, 20 + 50 * i, 230, 3, i)
+            ships[3][i] = self.SHIP
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
             self.SHIP.draw()
+        
         for i in range(11):
-            self.SHIP = Enemy(Alien3, 20 + 50 * i, 280, 0, i)
-            self.alienlist.append(self.SHIP)
+            self.SHIP = Enemy(Alien3, 20 + 50 * i, 280, 4, i)
+            ships[4][i] = self.SHIP
+            self.frontRow.add(self.SHIP)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
-            self.SHIP.draw()       
-
+            self.SHIP.draw()
+        
         #Explosion Group
         self.explosion_group = pygame.sprite.Group()
+
+        #Enemy Bullet Group
+        self.enemy_bullets = pygame.sprite.Group()
 
         pygame.display.flip()
         
@@ -593,6 +594,16 @@ class SpaceInvaders(object):
                 for currentSprite in value:
                     killed_sound=pygame.mixer.Sound('./sounds/invaderkilled.wav')
                     killed_sound.play()
+
+                    if self.frontRow.has(currentSprite):
+                        #print(currentSprite.row-1, currentSprite.col)
+                        i=1
+                        while type(ships[currentSprite.row-i][currentSprite.col])is not Enemy and (currentSprite.row-i)>=0:
+                            i=i+1
+
+                        if type(ships[currentSprite.row-i][currentSprite.col])is Enemy and (currentSprite.row-i)>=0:
+                            self.frontRow.add(ships[currentSprite.row-i][currentSprite.col])
+
                     if self.Aliens_1.has(currentSprite):
                         exp = Explosion(1, 30, currentSprite.rect.x, currentSprite.rect.y)
                         self.explosion_group.add(exp)
@@ -614,7 +625,7 @@ class SpaceInvaders(object):
                         self.Aliens_3.remove(currentSprite)
                         ships[currentSprite.row][currentSprite.col]=0
 
-                    self.All_Aliens.remove(currentSprite)
+                    currentSprite.kill()
                 break
 
         #Mystery and Player's bullet
@@ -648,66 +659,14 @@ class SpaceInvaders(object):
                 direct=random.choice([-1,1])
                 self.mystery.start(direct)
 
+
     def alien_shoot(self):
         chance=random.randint(1,5500)
-        if chance > 300 and chance < 350:
-            check=0
-            numaliens=55
-            randalien=random.randint(0,numaliens-12)
-            row=randalien/11
-            row=int(row)
-            col=randalien%11
-
-            for i in range(row,4):
-                if ships[i+1][col]==0 :
-                    check=1
-                else:
-                    check=0
-                    break
-            while check==0 or ships[row][col]==0:
-                randalien=random.randint(0,numaliens-1)
-                row=randalien/11
-                row=int(row)
-                col=randalien%11
-               
-                        
-                if row==4 and ships[row][col]==1:
-                    for i in range(0,row+1):
-                        for j in range(0,col+1):
-                            if ships[i][j]==0:
-                                randalien=randalien-1
-                    self.alienlist[randalien].shoot()
-                    return
-                else:
-                     for i in range(row,4):
-                         if ships[i+1][col]==0 :
-                             check=1
-                         else:
-                             check=0
-                             break
-                randalien=random.randint(0,numaliens-12)
-                row=randalien/11
-                row=int(row)
-                col=randalien%11
-                if row==4 and ships[row][col]==1:
-                    for i in range(0,row+1):
-                        for j in range(0,col+1):
-                            if ships[i][j]==0:
-                                randalien=randalien-1
-                    self.alienlist[randalien].shoot()
-                    return
-                else:
-                     for i in range(row,4):
-                         if ships[i+1][col]==0 :
-                             check=1
-                         else:
-                             check=0
-                             break
-            for i in range(0,row+1):
-                for j in range(0,col+1):
-                    if ships[i][j]==0:
-                        randalien=randalien-1
-            self.alienlist[randalien].shoot()
+        #print(chance,len(self.frontRow.sprites()))
+        if chance > 300 and chance < 350 and len(self.frontRow.sprites()):
+            shooter = random.choice(self.frontRow.sprites())
+            self.enemy_bullet = Bullet(shooter.rect.x+17, shooter.rect.y+18, False)
+            self.enemy_bullets.add(self.enemy_bullet)
 
     
     def main(self):
@@ -743,6 +702,7 @@ class SpaceInvaders(object):
                 self.block_group.draw(game.screen)
                 self.alien_shoot()
                 self.SHIP.update()
+                self.enemy_bullets.update()
                 self.update_stats()
                 self.mystery_appear()
                 self.mute_status(button_ctr)
