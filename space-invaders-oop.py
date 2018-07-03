@@ -697,6 +697,7 @@ class SpaceInvaders(object):
         chance=random.randint(1,5500)
         #print(chance,len(self.frontRow.sprites()))
         if chance > 300 and chance < 350 and len(self.frontRow.sprites()):
+            shoot_sound.play()
             shooter = random.choice(self.frontRow.sprites())
             self.enemy_bullet = Bullet(shooter.rect.x+17, shooter.rect.y+18, False)
             self.enemy_bullets.add(self.enemy_bullet)
