@@ -421,6 +421,71 @@ class SpaceInvaders(object):
                     pygame.mixer.music.pause()
         return ctr
 
+    def game_reset(self):
+    
+        self.background_text = self.titleText1.render('Next Level..', False, WHITE)
+        
+        self.screen.fill(BLACK)
+        self.start_time = time.time()
+        end =  False
+        while not end:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    
+            self.elapsed_time = time.time() - self.start_time
+            if self.elapsed_time <= 1:
+                alpha = (1.0 * self.elapsed_time )
+                
+
+            else:
+                end = True
+
+            self.background_surface_1 = pygame.surface.Surface((800,600))
+            self.background_surface_1.set_alpha(255 * alpha)
+
+            self.screen.fill(BLACK)
+            self.background_surface.blit(self.background_text, (300,300))
+            self.screen.blit(self.background_surface,(0,0))
+
+            pygame.display.flip()
+              
+        # Drawing ships
+        self.All_Aliens = pygame.sprite.Group()
+        self.Aliens_1 = pygame.sprite.Group()
+        self.Aliens_2 = pygame.sprite.Group()
+        self.Aliens_3 = pygame.sprite.Group()
+        
+        for i in range(11):
+            self.SHIP = Enemy(Alien1, 20 + 50 * i, 80, 4, i)
+            self.All_Aliens.add(self.SHIP)
+            self.Aliens_1.add(self.SHIP)
+            self.SHIP.draw()   
+        for i in range(11):
+            self.SHIP = Enemy(Alien2, 20 + 50 * i, 130, 3, i)
+            self.All_Aliens.add(self.SHIP)
+            self.Aliens_2.add(self.SHIP)
+            self.SHIP.draw()
+        for i in range(11):
+            self.SHIP = Enemy(Alien2, 20 + 50 * i, 180, 2, i)
+            self.All_Aliens.add(self.SHIP)
+            self.Aliens_2.add(self.SHIP)
+            self.SHIP.draw()
+        for i in range(11):
+            self.SHIP = Enemy(Alien3, 20 + 50 * i, 230, 1, i)
+            self.All_Aliens.add(self.SHIP)
+            self.Aliens_3.add(self.SHIP)
+            self.SHIP.draw()
+        for i in range(11):
+            self.SHIP = Enemy(Alien3, 20 + 50 * i, 280, 0, i)
+            self.All_Aliens.add(self.SHIP)
+            self.Aliens_3.add(self.SHIP)
+            self.SHIP.draw()       
+
+        pygame.display.flip()
+        
+        self.draw_state += 1
+    
     def update_stats(self):
         """
         Function to show current score, highest score and number of lifes left
@@ -785,6 +850,9 @@ class SpaceInvaders(object):
                             self.gameOver()
                         else:
                             remove_game_over_screen = True
+                            
+                if len(game.All_Aliens) == 0:
+                    self.game_reset()
 
 
 
