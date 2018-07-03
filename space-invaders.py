@@ -124,7 +124,7 @@ class Enemy(pygame.sprite.Sprite):
         self.speed_V = 12
         self.time_H = 0.75
         self.move_D = False
-        
+
     def update(self):
         game.timer += game.elapsed_time
         self.time_H = 0.40 + len(game.All_Aliens)/150
@@ -134,7 +134,7 @@ class Enemy(pygame.sprite.Sprite):
                 pygame.quit()
                 ## Explosion(Defender_Ship)
                 ## End_Game
-            
+
         #print(self.time_H) ### This left so that others can check if the above code needs chages
 
         if game.timer > self.time_H:
@@ -146,26 +146,26 @@ class Enemy(pygame.sprite.Sprite):
                     alien.rect.x += self.speed_H
                     alien.flip *= -1
                     alien.image = pygame.image.load(alien.images[alien.flip]).convert_alpha()
-                    alien.image = pygame.transform.scale(alien.image , (35, 35)) 
+                    alien.image = pygame.transform.scale(alien.image , (35, 35))
                     alien.draw()
                 if any(alien.rect.x > 720 for alien in game.All_Aliens) or\
                    any(alien.rect.x < 30 for alien in game.All_Aliens):
                     self.move_D = True
                     self.speed_H *= -1
                 game.timer -= self.time_H
-            
+
         else:
             for alien in game.All_Aliens:
                 alien.draw()
-                
-            
-                
+
+
+
     def down(self):
         for alien in game.All_Aliens:
             alien.rect.y += self.speed_V
             alien.flip *= -1
             alien.image = pygame.image.load(alien.images[alien.flip]).convert_alpha()
-            alien.image = pygame.transform.scale(alien.image , (35, 35)) 
+            alien.image = pygame.transform.scale(alien.image , (35, 35))
             alien.draw()
         self.move_D = False
         game.timer -= self.time_H
@@ -261,21 +261,21 @@ class Explosion(pygame.sprite.Sprite):
         else:
             if code == 1:
                 self.image = pygame.image.load("./images/explosionpurple.png")
-            
+
             elif code == 2:
                 self.image = pygame.image.load("./images/explosionblue.png")
-            
+
             elif code == 3:
                 self.image = pygame.image.load("./images/explosiongreen.png")
-            
+
             self.image = pygame.transform.scale(self.image, (40, 35))
             self.rect = self.image.get_rect(topleft=(x, y))
             game.screen.blit(self.image, self.rect)
-        
+
         self.timer = time.time()
 
     def update(self, currentTime):
-        
+
         if self.code == 4:
             if currentTime - self.timer <= 0.1:
                 game.screen.blit(self.textsurface,(self.x + 20, self.y + 6))
@@ -283,7 +283,7 @@ class Explosion(pygame.sprite.Sprite):
                 game.screen.blit(self.textsurface,(self.x + 20, self.y + 6))
             if currentTime - self.timer > 0.6:
                 self.kill()
-        
+
         elif self.code == 5:
             if currentTime - self.timer > 0.3 and currentTime - self.timer <= 0.6:
                 game.screen.blit(self.image, self.rect)
@@ -298,7 +298,7 @@ class Explosion(pygame.sprite.Sprite):
                 game.screen.blit(self.image, (self.rect.x-6, self.rect.y-6))
             if currentTime - self.timer > 0.4:
                 self.kill()
-        
+
         """elif self.isShip:
             if currentTime - self.timer > 300 and currentTime - self.timer <= 600:
                 game.screen.blit(self.image, self.rect)
@@ -422,9 +422,9 @@ class SpaceInvaders(object):
         return ctr
 
     def game_reset(self):
-    
+
         self.background_text = self.titleText1.render('Next Level..', False, WHITE)
-        
+
         self.screen.fill(BLACK)
         self.start_time = time.time()
         end =  False
@@ -432,11 +432,11 @@ class SpaceInvaders(object):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    
+
             self.elapsed_time = time.time() - self.start_time
             if self.elapsed_time <= 1:
                 alpha = (1.0 * self.elapsed_time )
-                
+
 
             else:
                 end = True
@@ -449,18 +449,18 @@ class SpaceInvaders(object):
             self.screen.blit(self.background_surface,(0,0))
 
             pygame.display.flip()
-              
+
         # Drawing ships
         self.All_Aliens = pygame.sprite.Group()
         self.Aliens_1 = pygame.sprite.Group()
         self.Aliens_2 = pygame.sprite.Group()
         self.Aliens_3 = pygame.sprite.Group()
-        
+
         for i in range(11):
             self.SHIP = Enemy(Alien1, 20 + 50 * i, 80, 4, i)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_1.add(self.SHIP)
-            self.SHIP.draw()   
+            self.SHIP.draw()
         for i in range(11):
             self.SHIP = Enemy(Alien2, 20 + 50 * i, 130, 3, i)
             self.All_Aliens.add(self.SHIP)
@@ -480,12 +480,12 @@ class SpaceInvaders(object):
             self.SHIP = Enemy(Alien3, 20 + 50 * i, 280, 0, i)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
-            self.SHIP.draw()       
+            self.SHIP.draw()
 
         pygame.display.flip()
-        
+
         self.draw_state += 1
-    
+
     def update_stats(self):
         """
         Function to show current score, highest score and number of lifes left
@@ -538,6 +538,9 @@ class SpaceInvaders(object):
         self.gameOverText = pygame.font.Font(FONT, 100)
         textsurface = self.gameOverText.render('GAME OVER', False, WHITE)
         self.screen.blit(textsurface, (100, 220))
+	pygame.mixer.music.stop()
+        game_oversound=pygame.mixer.Sound('./sounds/Game_Over.wav')
+        game_oversound.play()
 
 
     def start_game(self):
@@ -551,7 +554,7 @@ class SpaceInvaders(object):
 
         self.timer = 0
 
-        
+
         self.screen.fill(BLACK)
         start_time = time.time()
         end =  False
@@ -559,11 +562,11 @@ class SpaceInvaders(object):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-                    
+
             self.elapsed_time = time.time() - start_time
             if self.elapsed_time <= 1:
                 alpha = (1.0 * self.elapsed_time )
-                
+
 
             else:
                 end = True
@@ -594,48 +597,48 @@ class SpaceInvaders(object):
                 block_3 = Blocker(605+(15*i), 450+(12*j))
                 self.block_group.add(block_1, block_2, block_3)
         self.block_group.draw(game.screen)
-        
+
         #Mystery Ship
         self.mystery_group = pygame.sprite.Group()
         self.mystery=Mystery()
         self.mystery_group.add(self.mystery)
-        
+
         # Drawing ships
         self.All_Aliens = pygame.sprite.Group()
         self.Aliens_1 = pygame.sprite.Group()
         self.Aliens_2 = pygame.sprite.Group()
         self.Aliens_3 = pygame.sprite.Group()
-        
+
         self.frontRow = pygame.sprite.Group()
-        
+
         for i in range(11):
             self.SHIP = Enemy(Alien1, 20 + 50 * i, 80, 0, i)
             ships[0][i] = self.SHIP
             self.All_Aliens.add(self.SHIP)
             self.Aliens_1.add(self.SHIP)
             self.SHIP.draw()
-        
+
         for i in range(11):
             self.SHIP = Enemy(Alien2, 20 + 50 * i, 130, 1, i)
             ships[1][i] = self.SHIP
             self.All_Aliens.add(self.SHIP)
             self.Aliens_2.add(self.SHIP)
             self.SHIP.draw()
-        
+
         for i in range(11):
             self.SHIP = Enemy(Alien2, 20 + 50 * i, 180, 2, i)
             ships[2][i] = self.SHIP
             self.All_Aliens.add(self.SHIP)
             self.Aliens_2.add(self.SHIP)
             self.SHIP.draw()
-        
+
         for i in range(11):
             self.SHIP = Enemy(Alien3, 20 + 50 * i, 230, 3, i)
             ships[3][i] = self.SHIP
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
             self.SHIP.draw()
-        
+
         for i in range(11):
             self.SHIP = Enemy(Alien3, 20 + 50 * i, 280, 4, i)
             ships[4][i] = self.SHIP
@@ -643,7 +646,7 @@ class SpaceInvaders(object):
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
             self.SHIP.draw()
-        
+
         #Explosion Group
         self.explosion_group = pygame.sprite.Group()
 
@@ -654,11 +657,11 @@ class SpaceInvaders(object):
         self.enemy_bullets = pygame.sprite.Group()
 
         pygame.display.flip()
-        
+
         self.draw_state += 1
 
     def collisions_checking(self):
-        
+
         #Enemy's Bullet and Player's bullet
         currentcollisions = pygame.sprite.groupcollide(self.bullet_group, self.enemy_bullets, True, True)
 
@@ -698,7 +701,7 @@ class SpaceInvaders(object):
                         self.current_score += 20
                         self.Aliens_2.remove(currentSprite)
                         ships[currentSprite.row][currentSprite.col]=0
-                    
+
                     if self.Aliens_3.has(currentSprite):
                         exp = Explosion(3, 10, currentSprite.rect.x, currentSprite.rect.y)
                         self.explosion_group.add(exp)
@@ -722,11 +725,11 @@ class SpaceInvaders(object):
 
                     self.killed_time = time.time()
                     self.check = True
-                    
+
                     self.lives-=1
                     self.player_group.remove(currentSprite)
                 break
-        
+
         #Mystery and Player's bullet
         currentcollisions = pygame.sprite.groupcollide(self.bullet_group, self.mystery_group, True, False)
         if currentcollisions:
@@ -736,7 +739,7 @@ class SpaceInvaders(object):
                     killed_sound.play()
                     score = random.choice([50, 100, 150, 200])
                     exp = Explosion(4, score, currentSprite.rect.x, currentSprite.rect.y) #In place of 150, implement some random score here
-                    self.current_score += score 
+                    self.current_score += score
                     self.explosion_group.add(exp)
                     currentSprite.rect.x = -75
                     currentSprite.destroyed()
@@ -744,10 +747,10 @@ class SpaceInvaders(object):
 
         #Blocker and Enemy
         currentcollisions = pygame.sprite.groupcollide(self.All_Aliens, self.block_group, False, True)
-        
-    
+
+
     def mystery_appear(self):
-    
+
         if self.mystery.current_status==True:
             self.mystery.update()
 
@@ -769,7 +772,7 @@ class SpaceInvaders(object):
             self.enemy_bullet = Bullet(shooter.rect.x+17, shooter.rect.y+18, False)
             self.enemy_bullets.add(self.enemy_bullet)
 
-    
+
     def main(self):
         quit = False
         self.welcome_screen() #Display welcome message
@@ -804,8 +807,8 @@ class SpaceInvaders(object):
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE and (len(self.bullet_group.sprites()) == 0):
                             self.shoot()
-                        
-                self.start_time = time.time()        
+
+                self.start_time = time.time()
                 keystate = pygame.key.get_pressed()
 
                 ### CALL All updating functions here ###
@@ -823,7 +826,7 @@ class SpaceInvaders(object):
                 if grplen:
                     self.player_bullet.update()
                     self.player_bullet.draw()
-                
+
                 self.block_group.draw(game.screen)
                 self.alien_shoot()
                 self.SHIP.update()
@@ -832,7 +835,7 @@ class SpaceInvaders(object):
                 self.mystery_appear()
                 self.mute_status(button_ctr)
 
-                button_ctr=self.mute_status(button_ctr)            
+                button_ctr=self.mute_status(button_ctr)
                 self.collisions_checking()
                 self.explosion_group.update(time.time())
                 self.elapsed_time = time.time() - self.start_time
@@ -850,7 +853,7 @@ class SpaceInvaders(object):
                             self.gameOver()
                         else:
                             remove_game_over_screen = True
-                            
+
                 if len(game.All_Aliens) == 0:
                     self.game_reset()
 
@@ -875,5 +878,3 @@ class SpaceInvaders(object):
 if __name__ == '__main__':
     game = SpaceInvaders()
     game.main()
-
-
