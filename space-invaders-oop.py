@@ -559,16 +559,19 @@ class SpaceInvaders(object):
                         exp = Explosion(1, 30, currentSprite.rect.x, currentSprite.rect.y)
                         self.explosion_group.add(exp)
                         self.current_score += 30
+                        self.Aliens_1.remove(currentSprite)
 
                     if self.Aliens_2.has(currentSprite):
                         exp = Explosion(2, 20, currentSprite.rect.x, currentSprite.rect.y)
                         self.explosion_group.add(exp)
                         self.current_score += 20
+                        self.Aliens_2.remove(currentSprite)
                     
                     if self.Aliens_3.has(currentSprite):
                         exp = Explosion(3, 10, currentSprite.rect.x, currentSprite.rect.y)
                         self.explosion_group.add(exp)
                         self.current_score += 10
+                        self.Aliens_3.remove(currentSprite)
                             
 
                     self.All_Aliens.remove(currentSprite)
@@ -581,7 +584,9 @@ class SpaceInvaders(object):
                 for currentSprite in value:
                     killed_sound=pygame.mixer.Sound('./sounds/invaderkilled.wav')
                     killed_sound.play()
-                    exp = Explosion(4, 150, currentSprite.rect.x, currentSprite.rect.y) #In place of 150, implement some random score here
+                    score = random.choice([50, 100, 150, 200])
+                    exp = Explosion(4, score, currentSprite.rect.x, currentSprite.rect.y) #In place of 150, implement some random score here
+                    self.current_score += score 
                     self.explosion_group.add(exp)
                     currentSprite.destroyed()
                 break
