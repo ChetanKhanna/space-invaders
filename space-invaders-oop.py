@@ -200,6 +200,7 @@ class Mystery(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (75, 35))
         self.rect = self.image.get_rect(topleft=(20,40))
         self.current_status=False
+        self.rect.x = -75
 
     def start(self, direct):
         self.direct = direct
@@ -672,6 +673,7 @@ class SpaceInvaders(object):
                     exp = Explosion(4, score, currentSprite.rect.x, currentSprite.rect.y) #In place of 150, implement some random score here
                     self.current_score += score 
                     self.explosion_group.add(exp)
+                    currentSprite.rect.x = -75
                     currentSprite.destroyed()
                 break
 
