@@ -17,6 +17,8 @@ and award bonus points if destroyed.
 The ship is partially protected by several stationary defense bunkers that are 
 gradually destroyed by projectiles from the aliens and player.
 
+For more details about game and its features see Wiki of repository.
+
 ### How To Play :
 
 You can run the program in the command prompt 
