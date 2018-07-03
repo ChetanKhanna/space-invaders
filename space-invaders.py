@@ -538,6 +538,7 @@ class SpaceInvaders(object):
         self.gameOverText = pygame.font.Font(FONT, 100)
         textsurface = self.gameOverText.render('GAME OVER', False, WHITE)
         self.screen.blit(textsurface, (100, 220))
+	pygame.mixer.music.stop()
         game_oversound=pygame.mixer.Sound('./sounds/Game_Over.wav')
         game_oversound.play()
 
