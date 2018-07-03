@@ -508,14 +508,14 @@ class SpaceInvaders(object):
                     for i in range(0,row):
                         for j in range(0,col):
                             if ships[i][j]==0:
-                                randalien=randalien+1
+                                randalien=randalien-1
                     alienlist[randalien].shoot()
                     return
                 randalien=random.randint(0,numaliens-12)
             for i in range(0,row):
                 for j in range(0,col):
                     if ships[i][j]==0:
-                        randalien=randalien+1
+                        randalien=randalien-1
             alienlist[randalien].shoot()
             
             
