@@ -53,7 +53,7 @@ class Ship(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load("./images/ship.png").convert_alpha()
         self.rect = self.image.get_rect(topleft = (x_pos, y_pos))
-        self.moving_speed = 1
+        self.moving_speed = 2
         self.bullet_group = pygame.sprite.Group()
 
     def update(self, keystate):
@@ -140,7 +140,7 @@ class Enemy(pygame.sprite.Sprite):
 
     def update(self):
         game.timer += game.elapsed_time
-        self.time_H = 0.40 + len(game.All_Aliens)
+        self.time_H = 0.40 + len(game.All_Aliens)/150
         for alien in game.All_Aliens:
             if alien.rect.y >= 495:
                 pygame.quit()
@@ -532,33 +532,28 @@ class SpaceInvaders(object):
         self.Aliens_2 = pygame.sprite.Group()
         self.Aliens_3 = pygame.sprite.Group()
         
-        j = 4
         for i in range(11):
-            self.SHIP = Enemy(Alien1, 20 + 50 * i, 80, j, i)
+            self.SHIP = Enemy(Alien1, 20 + 50 * i, 80, 4, i)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_1.add(self.SHIP)
-            self.SHIP.draw()
-            j -= 1    
+            self.SHIP.draw()   
         for i in range(11):
-            self.SHIP = Enemy(Alien2, 20 + 50 * i, 130, j, i)
+            self.SHIP = Enemy(Alien2, 20 + 50 * i, 130, 3, i)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_2.add(self.SHIP)
             self.SHIP.draw()
-            j -= 1
         for i in range(11):
-            self.SHIP = Enemy(Alien2, 20 + 50 * i, 180, j, i)
+            self.SHIP = Enemy(Alien2, 20 + 50 * i, 180, 2, i)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_2.add(self.SHIP)
             self.SHIP.draw()
-            j -= 1
         for i in range(11):
-            self.SHIP = Enemy(Alien3, 20 + 50 * i, 230, j, i)
+            self.SHIP = Enemy(Alien3, 20 + 50 * i, 230, 1, i)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
             self.SHIP.draw()
-            j -= 1
         for i in range(11):
-            self.SHIP = Enemy(Alien3, 20 + 50 * i, 280, j, i)
+            self.SHIP = Enemy(Alien3, 20 + 50 * i, 280, 0, i)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
             self.SHIP.draw()       
