@@ -91,7 +91,7 @@ class Bullet(pygame.sprite.Sprite):
             self.rect = self.image.get_rect(midbottom = (x_pos, y_pos))
             self.velocity = -3
         else:
-            self.image = pygame.image.load("./images/ship.png").convert_alpha()
+            self.image = pygame.image.load("./images/enemylaser.png").convert_alpha()
             self.rect = self.image.get_rect(midbottom = (x_pos, y_pos))
             self.velocity = 3
 
@@ -121,6 +121,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=(x, y))
         self.speed_H = 15
         self.speed_V = 12
+        self.bullet_group = pygame.sprite.Group()
 
 
     def update(self):
@@ -156,10 +157,16 @@ class Enemy(pygame.sprite.Sprite):
     def shoot(self):
         # not all ships will shoot at once, we need to randomly select some of them
         # and call the Missile.shoot function or something to make them shoot
-        pass
+        self.enemy_bullet = Bullet((self.rect.x +18) , (self.rect.y+18) , ofPlayer = False)
+        self.bullet_group.add(self.enemy_bullet)
+        shoot_sound.play()
 
     def draw(self):
         game.screen.blit(self.image, self.rect)
+        grplen = len(self.bullet_group.sprites())
+        if grplen:
+            self.enemy_bullet.update()
+            self.enemy_bullet.draw()
 
 class Blocker(pygame.sprite.Sprite):
     """
@@ -320,6 +327,7 @@ class SpaceInvaders(object):
         self.current_player = 1
         self.draw_state = 0
         self.background = pygame.image.load("./images/background.png").convert_alpha()
+        self.alienlist=[]
         #other variables will also be required
 
         #Initializing font module
@@ -507,26 +515,31 @@ class SpaceInvaders(object):
         
         for i in range(11):
             self.SHIP = Enemy("./images/enemy1_1.png", 20 + 50 * i, 80, 0, i)
+            self.alienlist.append(self.SHIP)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_1.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
             self.SHIP = Enemy("./images/enemy2_1.png", 20 + 50 * i, 130, 1, i)
+            self.alienlist.append(self.SHIP)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_2.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
             self.SHIP = Enemy("./images/enemy2_1.png", 20 + 50 * i, 180, 2, i)
+            self.alienlist.append(self.SHIP)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_2.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
             self.SHIP = Enemy("./images/enemy3_1.png", 20 + 50 * i, 230, 3, i)
+            self.alienlist.append(self.SHIP)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
             self.SHIP.draw()
         for i in range(11):
             self.SHIP = Enemy("./images/enemy3_1.png", 20 + 50 * i, 280, 4, i)
+            self.alienlist.append(self.SHIP)
             self.All_Aliens.add(self.SHIP)
             self.Aliens_3.add(self.SHIP)
             self.SHIP.draw()
@@ -611,7 +624,73 @@ class SpaceInvaders(object):
                 self.mystery_group.add(self.mystery)
                 direct=random.choice([-1,1])
                 self.mystery.start(direct)
-
+    
+    def alien_shoot(self):
+        chance=random.randint(1,10000)
+        if chance > 300 and chance < 350:
+            numaliens=55
+            randalien=random.randint(0,numaliens-12)
+            row=randalien/11
+            row=int(row)
+            col=randalien%11
+            if row==4 and ships[row][col]==1:
+                    for i in range(0,row):
+                        for j in range(0,col):
+                            if ships[i][j]==0:
+                                randalien=randalien-1
+                    self.alienlist[randalien].shoot()
+                    return
+            else:
+                    for i in range(row,4):
+                         if ships[i+1][col]==0 :
+                             check=1
+                         else:
+                             check=0
+                             break
+            while check==0 or ships[row][col]==0:
+                randalien=random.randint(0,numaliens-1)
+                row=randalien/11
+                row=int(row)
+                col=randalien%11
+               
+                        
+                if row==4 and ships[row][col]==1:
+                    for i in range(0,row):
+                        for j in range(0,col):
+                            if ships[i][j]==0:
+                                randalien=randalien-1
+                    self.alienlist[randalien].shoot()
+                    return
+                else:
+                     for i in range(row,4):
+                         if ships[i+1][col]==0 :
+                             check=1
+                         else:
+                             check=0
+                             break
+                randalien=random.randint(0,numaliens-12)
+                row=randalien/11
+                row=int(row)
+                col=randalien%11
+                if row==4 and ships[row][col]==1:
+                    for i in range(0,row):
+                        for j in range(0,col):
+                            if ships[i][j]==0:
+                                randalien=randalien-1
+                    self.alienlist[randalien].shoot()
+                    return
+                else:
+                     for i in range(row,4):
+                         if ships[i+1][col]==0 :
+                             check=1
+                         else:
+                             check=0
+                             break
+            for i in range(0,row):
+                for j in range(0,col):
+                    if ships[i][j]==0:
+                        randalien=randalien-1
+            self.alienlist[randalien].shoot()
 
     def main(self):
         quit = False
@@ -643,6 +722,7 @@ class SpaceInvaders(object):
                 self.screen.blit(self.background,(0,0))
                 self.player.update(keystate)
                 self.block_group.draw(game.screen)
+                self.alien_shoot()
                 game.SHIP.update()
                 self.dt = time.time() - self.st
                 self.update_stats()
@@ -665,3 +745,7 @@ class SpaceInvaders(object):
             #pygame.display.update() #Update portions of the screen for software displays
 
         pygame.quit() #Uninitialize all pygame modules
+
+if __name__ == '__main__':
+    game = SpaceInvaders()
+    game.main()
