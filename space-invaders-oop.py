@@ -116,8 +116,8 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.image.load(image).convert_alpha()
         self.image = pygame.transform.scale(self.image, (35, 35))
         self.rect = self.image.get_rect(topleft=(x, y))
-        self.speed_H = 15
-        self.speed_V = 12
+        self.speed_H = 35
+        self.speed_V = 75
 
 
     def update(self):
@@ -127,7 +127,6 @@ class Enemy(pygame.sprite.Sprite):
 
         for alien in game.All_Aliens:
             if alien.rect.y >= 415:
-                pygame.quit()
 
         if game.timer_2 > 1600:
             self.speed_H = -(self.speed_H)
@@ -386,6 +385,7 @@ class SpaceInvaders(object):
         self.screen.blit(button, (750,5))
 
     def gameOver(self):
+
         self.gameOverText = pygame.font.Font(FONT, 100)
         textsurface = self.gameOverText.render('GAME OVER', False, WHITE)
         self.screen.blit(textsurface, (100, 220))
@@ -490,7 +490,7 @@ class SpaceInvaders(object):
     def main(self):
         quit = False
         self.welcome_screen() #Display welcome message
-        #self.gameOver()  #just checking game over screen
+        #self.gameOver(self.screen)  #just checking game over screen
         initial=time.clock()
         self.st = time.time()
         self.dt = 0
@@ -527,8 +527,8 @@ class SpaceInvaders(object):
                 self.mute_status(button_ctr)
                 button_ctr=self.mute_status(button_ctr)
 
-                if len(self.All_Aliens) == 0:
-                    self.screen.fill(BLACK)
+                if self.lives == 0:
+
                     self.gameOver()
                     game_over_show_time = time.time()
                     remove_game_over_screen = False
