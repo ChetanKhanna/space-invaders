@@ -499,7 +499,6 @@ class SpaceInvaders(object):
     def alien_shoot(self):
         chance=random.randint(1,10000)
         if chance > 300 and chance < 350:
-            #alienlist=self.All_Aliens.sprites()
             numaliens=55
             randalien=random.randint(0,numaliens-12)
             row=randalien/11
